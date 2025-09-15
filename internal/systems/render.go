@@ -7,6 +7,7 @@ import (
 	"github.com/gfeyer/ebit/internal/camera"
 	"github.com/gfeyer/ebit/internal/components"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/colorm"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
@@ -51,13 +52,17 @@ func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 			op.GeoM.Translate(p.X-cam.X, p.Y-cam.Y)
 		}
 
-		// Whiten selected units
+		// Tint selected units white-blue
 		if sel.Selected {
-			cs := op.ColorScale
-			cs.Scale(1.5, 1.5, 1.5, 1)
-			op.ColorScale = cs
+			cm := colorm.ColorM{}
+			cm.Scale(0, 0, 0, 1)
+			cm.Translate(0, 1, 0, 0)
+			colorm.DrawImage(screen, *img, cm, &colorm.DrawImageOptions{
+				GeoM: op.GeoM,
+			})
+		} else {
+			screen.DrawImage(*img, op)
 		}
-		screen.DrawImage(*img, op)
 	})
 
 	// Draw drag selection
