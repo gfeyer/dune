@@ -84,7 +84,7 @@ func UpdateBuildInput(ecs *ecs.ECS) {
 		menuY := minimap.Y + minimap.Height + 10
 		padding := 5
 		iconWidth := (minimap.Width - padding) / 2
-		iconHeight := iconWidth // Square tiles
+		rowHeight := 64 + padding // from game.go
 
 		i := 0
 		BuildMenuQuery.Each(ecs.World, func(entry *donburi.Entry) {
@@ -95,9 +95,13 @@ func UpdateBuildInput(ecs *ecs.ECS) {
 
 			// Calculate position for the icon with padding
 			iconX := menuX + col*(iconWidth+padding)
-			iconY := menuY + row*(iconHeight+padding)
+			iconY := menuY + row*rowHeight
 
-			if mx >= iconX && mx < iconX+iconWidth && my >= iconY && my < iconY+iconHeight {
+			// Use the actual icon dimensions for the click check
+			actualIconWidth := buildInfo.Icon.Bounds().Dx()
+			actualIconHeight := buildInfo.Icon.Bounds().Dy()
+
+			if mx >= iconX && mx < iconX+actualIconWidth && my >= iconY && my < iconY+actualIconHeight {
 				// Clicked on this build option
 				placement.IsPlacing = true
 				placement.BuildingType = buildInfo.Type
