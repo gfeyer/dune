@@ -97,7 +97,7 @@ func UpdateInput(ecs *ecs.ECS) {
 		})
 
 		QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
-			if components.SelectableRes.Get(entry).Selected {
+			if components.SelectableRes.Get(entry).Selected && entry.HasComponent(components.UnitRes) {
 				unit := components.UnitRes.Get(entry)
 				// If it's a harvester and a spice field was clicked, set it as the target
 				if unit.Type == components.Harvester && targetSpice != nil {

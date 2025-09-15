@@ -31,7 +31,10 @@ func DrawBuildMenu(ecs *ecs.ECS, screen *ebiten.Image) {
 	var selectedBuilding *donburi.Entry
 	SelectedBuildingQuery.Each(ecs.World, func(entry *donburi.Entry) {
 		if components.SelectableRes.Get(entry).Selected {
-			selectedBuilding = entry
+			// Ensure the selected entity is a building before changing the menu
+			if entry.HasComponent(components.RefineryRes) || entry.HasComponent(components.BarracksRes) {
+				selectedBuilding = entry
+			}
 		}
 	})
 
