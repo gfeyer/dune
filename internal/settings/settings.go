@@ -16,3 +16,9 @@ type Settings struct {
 var SettingsRes = donburi.NewComponentType[Settings]()
 
 var SettingsQuery = donburi.NewQuery(filter.Contains(SettingsRes))
+
+// GetSettings gets the settings from the world.
+func GetSettings(w donburi.World) *Settings {
+	entry, _ := SettingsQuery.First(w)
+	return SettingsRes.Get(entry)
+}

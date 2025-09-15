@@ -58,7 +58,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideW, outsideH int) (int, int) {
-	entry, _ := settings.SettingsQuery.First(g.ecs.World)
-	s := settings.SettingsRes.Get(entry)
+	s := settings.GetSettings(g.ecs.World)
 	return s.ScreenWidth, s.ScreenHeight
 }

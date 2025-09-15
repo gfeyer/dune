@@ -24,9 +24,8 @@ func Update(ecs *ecs.ECS) {
 	cameraEntry, _ := CameraQuery.First(ecs.World)
 	cam := CameraRes.Get(cameraEntry)
 
-	s, _ := settings.SettingsQuery.First(ecs.World)
-	settings := settings.SettingsRes.Get(s)
-
+	settings := settings.GetSettings(ecs.World)
+	
 	// Pan with arrow keys
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
 		cam.X -= 5

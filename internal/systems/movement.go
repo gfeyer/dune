@@ -18,9 +18,8 @@ var (
 func UpdateMovement(ecs *ecs.ECS) {
 	const dt = 1.0 / 60.0
 
-	settingsEntry, _ := qSettings.First(ecs.World)
-	s := settings.SettingsRes.Get(settingsEntry)
-
+	s := settings.GetSettings(ecs.World)
+	
 	qMovers.Each(ecs.World, func(entry *donburi.Entry) {
 		p := components.Position.Get(entry)
 		v := components.Velocity.Get(entry)
