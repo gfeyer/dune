@@ -91,6 +91,11 @@ func NewGame(w, h int) *Game {
 	factory.CreateBuildOption(world, components.BuildingRefinery, "Refinery", 750, iconWidth, iconHeight)
 	factory.CreateBuildOption(world, components.BuildingBarracks, "Barracks", 250, iconWidth, iconHeight)
 
+	// Create unit options
+	factory.CreateUnitOption(world, components.Harvester, "Harvester", 500, components.BuildingRefinery, iconWidth, iconHeight)
+	factory.CreateUnitOption(world, components.Trike, "Trike", 350, components.BuildingBarracks, iconWidth, iconHeight)
+	factory.CreateUnitOption(world, components.Quad, "Quad", 800, components.BuildingBarracks, iconWidth, iconHeight)
+
 	// Spawn spice
 	s := settings.GetSettings(world)
 	for i := 0; i < 50; i++ {

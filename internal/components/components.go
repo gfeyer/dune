@@ -13,6 +13,7 @@ type UnitType int
 
 const (
 	Trike UnitType = iota
+	Quad
 	Harvester
 )
 
@@ -92,6 +93,14 @@ type BuildInfo struct {
 	Icon *ebiten.Image
 }
 
+type UnitInfo struct {
+	Type             UnitType
+	Name             string
+	Cost             int
+	Icon             *ebiten.Image
+	RequiredBuilding BuildingType
+}
+
 type Player struct {
 	Money int
 }
@@ -113,6 +122,7 @@ var (
 	RefineryRes   = donburi.NewComponentType[Refinery]()
 	BarracksRes   = donburi.NewComponentType[Barracks]()
 	BuildInfoRes  = donburi.NewComponentType[BuildInfo]()
+	UnitInfoRes   = donburi.NewComponentType[UnitInfo]()
 	PlacementRes  = donburi.NewComponentType[Placement]()
 	HealthRes     = donburi.NewComponentType[Health]()
 	PlayerRes     = donburi.NewComponentType[Player]()

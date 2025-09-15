@@ -54,6 +54,22 @@ func CreateTrike(w donburi.World, x, y float64) {
 	*components.HealthRes.Get(entry) = components.Health{Current: 50, Max: 50}
 }
 
+func CreateQuad(w donburi.World, x, y float64) {
+	e := w.Create(components.Position, components.Sprite, components.UnitRes, components.SelectableRes, components.TargetRes, components.Velocity, components.HealthRes)
+	entry := w.Entry(e)
+
+	// Quad is a green square
+	img := ebiten.NewImage(16, 16)
+	img.Fill(color.RGBA{R: 0, G: 255, B: 0, A: 255})
+
+	*components.Position.Get(entry) = components.Pos{X: x, Y: y}
+	*components.Sprite.Get(entry) = img
+	*components.UnitRes.Get(entry) = components.Unit{Type: components.Quad}
+	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
+	*components.Velocity.Get(entry) = components.Vel{}
+	*components.HealthRes.Get(entry) = components.Health{Current: 80, Max: 80}
+}
+
 func CreateSpice(w donburi.World, x, y float64) {
 	e := w.Create(components.Position, components.Sprite, components.SpiceRes, components.Velocity, components.SelectableRes, components.SpiceAmountRes)
 	entry := w.Entry(e)
@@ -100,8 +116,39 @@ func CreateBuildOption(w donburi.World, btype components.BuildingType, name stri
 	}
 }
 
+func CreateUnitOption(w donburi.World, utype components.UnitType, name string, cost int, requiredBuilding components.BuildingType, width, height int) {
+	e := w.Create(components.UnitInfoRes)
+	entry := w.Entry(e)
+
+	icon := ebiten.NewImage(width, height)
+	bgColor := color.RGBA{R: 128, G: 128, B: 128, A: 255} // Gray background
+	icon.Fill(bgColor)
+
+	// Draw text on the icon
+	nameText := name
+	costText := fmt.Sprintf("Cost: %d", cost)
+
+	// Center the name text
+	nameBounds := text.BoundString(basicfont.Face7x13, nameText)
+	nameX := (width - nameBounds.Dx()) / 2
+	text.Draw(icon, nameText, basicfont.Face7x13, nameX, 15, color.White)
+
+	// Center the cost text
+	costBounds := text.BoundString(basicfont.Face7x13, costText)
+	costX := (width - costBounds.Dx()) / 2
+	text.Draw(icon, costText, basicfont.Face7x13, costX, 30, color.White)
+
+	*components.UnitInfoRes.Get(entry) = components.UnitInfo{
+		Type:             utype,
+		Name:             name,
+		Cost:             cost,
+		Icon:             icon,
+		RequiredBuilding: requiredBuilding,
+	}
+}
+
 func CreateBarracks(w donburi.World, x, y float64) {
-	e := w.Create(components.Position, components.Sprite, components.BarracksRes)
+	e := w.Create(components.Position, components.Sprite, components.BarracksRes, components.SelectableRes)
 	entry := w.Entry(e)
 
 	// Barracks is a red square
@@ -111,10 +158,11 @@ func CreateBarracks(w donburi.World, x, y float64) {
 	*components.Position.Get(entry) = components.Pos{X: x, Y: y}
 	*components.Sprite.Get(entry) = img
 	*components.BarracksRes.Get(entry) = components.Barracks{}
+	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
 }
 
 func CreateRefinery(w donburi.World, x, y float64) {
-	e := w.Create(components.Position, components.Sprite, components.RefineryRes)
+	e := w.Create(components.Position, components.Sprite, components.RefineryRes, components.SelectableRes)
 	entry := w.Entry(e)
 
 	// Refinery is a gray square
@@ -124,4 +172,5 @@ func CreateRefinery(w donburi.World, x, y float64) {
 	*components.Position.Get(entry) = components.Pos{X: x, Y: y}
 	*components.Sprite.Get(entry) = img
 	*components.RefineryRes.Get(entry) = components.Refinery{}
+	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
 }
