@@ -68,6 +68,29 @@ type Health struct {
 
 type Refinery struct{}
 
+type Barracks struct{}
+
+type BuildingType int
+
+const (
+	BuildingRefinery BuildingType = iota
+	BuildingBarracks
+)
+
+type Placement struct {
+	IsPlacing   bool
+	BuildingType BuildingType
+	Icon         *ebiten.Image
+	Cost         int
+}
+
+type BuildInfo struct {
+	Type BuildingType
+	Name string
+	Cost int
+	Icon *ebiten.Image
+}
+
 type Player struct {
 	Money int
 }
@@ -87,6 +110,9 @@ var (
 	HarvesterRes  = donburi.NewComponentType[HarvesterData]()
 	SpiceAmountRes = donburi.NewComponentType[SpiceAmount]()
 	RefineryRes   = donburi.NewComponentType[Refinery]()
+	BarracksRes   = donburi.NewComponentType[Barracks]()
+	BuildInfoRes  = donburi.NewComponentType[BuildInfo]()
+	PlacementRes  = donburi.NewComponentType[Placement]()
 	HealthRes     = donburi.NewComponentType[Health]()
 	PlayerRes     = donburi.NewComponentType[Player]()
 )

@@ -14,12 +14,10 @@ import (
 	"github.com/yohamta/donburi/filter"
 )
 
-var (
-	qMinimap = donburi.NewQuery(filter.Contains(components.MinimapRes))
-)
+var MinimapQuery = donburi.NewQuery(filter.Contains(components.MinimapRes))
 
 func UpdateMinimap(ecs *ecs.ECS) {
-	minimapEntry, ok := qMinimap.First(ecs.World)
+	minimapEntry, ok := MinimapQuery.First(ecs.World)
 	if !ok {
 		return
 	}
@@ -62,7 +60,7 @@ func UpdateMinimap(ecs *ecs.ECS) {
 }
 
 func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
-	minimapEntry, ok := qMinimap.First(ecs.World)
+	minimapEntry, ok := MinimapQuery.First(ecs.World)
 	if !ok {
 		return
 	}

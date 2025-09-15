@@ -52,6 +52,11 @@ func NewGame(w, h int) *Game {
 	dentry := world.Entry(de)
 	*components.DragRes.Get(dentry) = components.Drag{}
 
+	// Create placement
+	ple := world.Create(components.PlacementRes)
+	plentry := world.Entry(ple)
+	*components.PlacementRes.Get(plentry) = components.Placement{}
+
 	// Create player
 	pe := world.Create(components.PlayerRes)
 	pentry := world.Entry(pe)
@@ -61,6 +66,7 @@ func NewGame(w, h int) *Game {
 	ecs.AddSystem(systems.UpdateMovement)
 	ecs.AddSystem(systems.ResolveCollisions)
 	ecs.AddSystem(systems.UpdateInput)
+	ecs.AddSystem(systems.UpdateBuildInput)
 	ecs.AddSystem(camera.Update)
 	ecs.AddSystem(systems.UpdateMinimap)
 	ecs.AddSystem(systems.UpdateHarvester)
@@ -69,11 +75,17 @@ func NewGame(w, h int) *Game {
 	ecs.AddRenderer(systems.LayerSprites, systems.DrawSprites)
 	ecs.AddRenderer(systems.LayerUI, systems.DrawUI)
 	ecs.AddRenderer(systems.LayerMinimap, systems.DrawMinimap)
+	ecs.AddRenderer(systems.LayerBuildMenuUI, systems.DrawBuildMenu)
+	ecs.AddRenderer(systems.LayerPlacement, systems.DrawPlacement)
 
 	// Spawn initial units
 	factory.CreateTrike(world, 100, 100)
 	factory.CreateHarvester(world, 200, 200)
 	factory.CreateRefinery(world, 50, 50)
+
+	// Create build options
+	factory.CreateBuildOption(world, components.BuildingRefinery, "Refinery", 750)
+	factory.CreateBuildOption(world, components.BuildingBarracks, "Barracks", 250)
 
 	// Spawn spice
 	s := settings.GetSettings(world)
@@ -96,6 +108,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.ecs.DrawLayer(systems.LayerSprites, screen)
 	g.ecs.DrawLayer(systems.LayerUI, screen)
 	g.ecs.DrawLayer(systems.LayerMinimap, screen)
+	g.ecs.DrawLayer(systems.LayerBuildMenuUI, screen)
+	g.ecs.DrawLayer(systems.LayerPlacement, screen)
 }
 
 func (g *Game) Layout(outsideW, outsideH int) (int, int) {

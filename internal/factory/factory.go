@@ -67,6 +67,39 @@ func CreateSpice(w donburi.World, x, y float64) {
 	*components.SpiceAmountRes.Get(entry) = components.SpiceAmount{Amount: 1000}
 }
 
+func CreateBuildOption(w donburi.World, btype components.BuildingType, name string, cost int) {
+	e := w.Create(components.BuildInfoRes)
+	entry := w.Entry(e)
+
+	icon := ebiten.NewImage(32, 32)
+	switch btype {
+	case components.BuildingRefinery:
+		icon.Fill(color.RGBA{R: 128, G: 128, B: 128, A: 255}) // Gray for Refinery
+	case components.BuildingBarracks:
+		icon.Fill(color.RGBA{R: 255, G: 0, B: 0, A: 255}) // Red for Barracks
+	}
+
+	*components.BuildInfoRes.Get(entry) = components.BuildInfo{
+		Type: btype,
+		Name: name,
+		Cost: cost,
+		Icon: icon,
+	}
+}
+
+func CreateBarracks(w donburi.World, x, y float64) {
+	e := w.Create(components.Position, components.Sprite, components.BarracksRes)
+	entry := w.Entry(e)
+
+	// Barracks is a red square
+	img := ebiten.NewImage(64, 64)
+	img.Fill(color.RGBA{R: 255, G: 0, B: 0, A: 255})
+
+	*components.Position.Get(entry) = components.Pos{X: x, Y: y}
+	*components.Sprite.Get(entry) = img
+	*components.BarracksRes.Get(entry) = components.Barracks{}
+}
+
 func CreateRefinery(w donburi.World, x, y float64) {
 	e := w.Create(components.Position, components.Sprite, components.RefineryRes)
 	entry := w.Entry(e)

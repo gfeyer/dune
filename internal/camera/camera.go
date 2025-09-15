@@ -13,6 +13,11 @@ type Camera struct {
 	X, Y float64
 }
 
+// ScreenToWorld converts screen coordinates to world coordinates.
+func (c *Camera) ScreenToWorld(x, y float64) (float64, float64) {
+	return x + c.X, y + c.Y
+}
+
 var CameraRes = donburi.NewComponentType[Camera]()
 
 var (
