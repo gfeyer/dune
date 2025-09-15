@@ -20,4 +20,9 @@ var (
 
 	// Query for selected buildings
 	SelectedBuildingQuery = donburi.NewQuery(filter.Contains(components.SelectableRes))
+
+	// Query for selectable units
+	SelectableUnitQuery = donburi.NewQuery(filter.And(
+		filter.Contains(components.Position, components.SelectableRes, components.UnitRes),
+	))
 )

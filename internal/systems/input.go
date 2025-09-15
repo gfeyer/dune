@@ -45,7 +45,7 @@ func UpdateInput(ecs *ecs.ECS) {
 			})
 
 			rect := image.Rect(drag.StartX, drag.StartY, drag.EndX, drag.EndY).Canon()
-			QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
+			SelectableUnitQuery.Each(ecs.World, func(entry *donburi.Entry) {
 				p := components.Position.Get(entry)
 				screenX, screenY := int(p.X-cam.X), int(p.Y-cam.Y)
 				if image.Pt(screenX, screenY).In(rect) {
