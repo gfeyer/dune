@@ -99,7 +99,7 @@ func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
 		barWidth := float32((*img).Bounds().Dx())
 
 		// Health bar
-		healthBarY := float32(p.Y-cam.Y) - 8
+		healthBarY := float32(p.Y-cam.Y) - 12
 		healthPercentage := float32(health.Current) / float32(health.Max)
 		vector.DrawFilledRect(screen, float32(p.X-cam.X), healthBarY, barWidth, 4, color.RGBA{R: 255, A: 255}, false)
 		vector.DrawFilledRect(screen, float32(p.X-cam.X), healthBarY, barWidth*healthPercentage, 4, color.RGBA{G: 255, A: 255}, false)
@@ -108,8 +108,8 @@ func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
 		harvester := components.HarvesterRes.Get(entry)
 		spiceBarY := healthBarY + 5
 		spicePercentage := float32(harvester.CarriedAmount) / float32(harvester.Capacity)
-		vector.DrawFilledRect(screen, float32(p.X-cam.X), spiceBarY, barWidth, 2, color.RGBA{R: 255, G: 165, A: 255}, false)
-		vector.DrawFilledRect(screen, float32(p.X-cam.X), spiceBarY, barWidth*spicePercentage, 2, color.RGBA{R: 255, G: 140, B: 0, A: 255}, false)
+		vector.DrawFilledRect(screen, float32(p.X-cam.X), spiceBarY, barWidth, 4, color.RGBA{R: 64, G: 64, B: 64, A: 255}, false)
+		vector.DrawFilledRect(screen, float32(p.X-cam.X), spiceBarY, barWidth*spicePercentage, 4, color.RGBA{R: 255, G: 140, B: 0, A: 255}, false)
 
 		// Unit label
 		labelY := int(healthBarY) - 2
