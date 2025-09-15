@@ -30,6 +30,7 @@ var (
 		filter.Not(filter.Contains(components.HarvesterRes)),
 	))
 	qHarvesterUI = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.UnitRes, components.HealthRes, components.HarvesterRes))
+	qRefineryUI  = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.RefineryRes))
 )
 
 func DrawSprites(ecs *ecs.ECS, screen *ebiten.Image) {
@@ -116,6 +117,13 @@ func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
 		// Unit label
 		labelY := int(healthBarY) - 2
 		text.Draw(screen, "Harvester", basicfont.Face7x13, int(p.X-cam.X), labelY, color.White)
+	})
+
+	// Draw UI elements on top of Refineries
+	qRefineryUI.Each(ecs.World, func(entry *donburi.Entry) {
+		p := components.Position.Get(entry)
+		labelY := int(p.Y-cam.Y) - 2
+		text.Draw(screen, "Refinery", basicfont.Face7x13, int(p.X-cam.X), labelY, color.White)
 	})
 
 	// Draw drag selection
