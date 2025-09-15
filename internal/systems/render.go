@@ -2,6 +2,7 @@ package systems
 
 import (
 	"image/color"
+	"math"
 
 	"github.com/gfeyer/ebit/internal/camera"
 	"github.com/gfeyer/ebit/internal/components"
@@ -17,7 +18,7 @@ const (
 )
 
 var (
-	qSprites = donburi.NewQuery(filter.Contains(components.Position, components.Sprite))
+	qSprites = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.Velocity))
 )
 
 func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
@@ -30,9 +31,26 @@ func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 		p := components.Position.Get(entry)
 		img := components.Sprite.Get(entry)
 
+		v := components.Velocity.Get(entry)
+
 		// Draw sprite
 		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(p.X-cam.X, p.Y-cam.Y)
+
+		// Rotate sprite if it's moving
+		if v.X != 0 || v.Y != 0 {
+			bounds := (*img).Bounds()
+			centerX, centerY := float64(bounds.Dx())/2, float64(bounds.Dy())/2
+
+			// Translate to center for rotation
+			op.GeoM.Translate(-centerX, -centerY)
+			// Rotate
+			op.GeoM.Rotate(math.Atan2(v.Y, v.X) + math.Pi/2)
+			// Translate to final position
+			op.GeoM.Translate(p.X-cam.X+centerX, p.Y-cam.Y+centerY)
+		} else {
+			op.GeoM.Translate(p.X-cam.X, p.Y-cam.Y)
+		}
+
 		screen.DrawImage(*img, op)
 
 		// Draw selection indicator

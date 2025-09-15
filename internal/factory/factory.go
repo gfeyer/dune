@@ -29,10 +29,11 @@ func CreateTrike(w donburi.World, x, y float64) {
 
 	// Trike is a blue triangle
 	img := ebiten.NewImage(24, 24)
+	r, g, b, a := color.RGBA{R: 0, G: 0, B: 255, A: 255}.RGBA()
 	triangle := []ebiten.Vertex{
-		{DstX: 12, DstY: 2, SrcX: 1, SrcY: 1, ColorR: 0, ColorG: 0, ColorB: 1, ColorA: 1},
-		{DstX: 2, DstY: 22, SrcX: 1, SrcY: 1, ColorR: 0, ColorG: 0, ColorB: 1, ColorA: 1},
-		{DstX: 22, DstY: 22, SrcX: 1, SrcY: 1, ColorR: 0, ColorG: 0, ColorB: 1, ColorA: 1},
+		{DstX: 12, DstY: 2, SrcX: 0, SrcY: 0, ColorR: float32(r) / 0xffff, ColorG: float32(g) / 0xffff, ColorB: float32(b) / 0xffff, ColorA: float32(a) / 0xffff},
+		{DstX: 2, DstY: 22, SrcX: 0, SrcY: 0, ColorR: float32(r) / 0xffff, ColorG: float32(g) / 0xffff, ColorB: float32(b) / 0xffff, ColorA: float32(a) / 0xffff},
+		{DstX: 22, DstY: 22, SrcX: 0, SrcY: 0, ColorR: float32(r) / 0xffff, ColorG: float32(g) / 0xffff, ColorB: float32(b) / 0xffff, ColorA: float32(a) / 0xffff},
 	}
 	whiteSubimage := ebiten.NewImage(1, 1)
 	whiteSubimage.Fill(color.White)
