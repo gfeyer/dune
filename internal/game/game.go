@@ -52,6 +52,11 @@ func NewGame(w, h int) *Game {
 	dentry := world.Entry(de)
 	*components.DragRes.Get(dentry) = components.Drag{}
 
+	// Create player
+	pe := world.Create(components.PlayerRes)
+	pentry := world.Entry(pe)
+	*components.PlayerRes.Get(pentry) = components.Player{Money: 1000}
+
 	// Register systems
 	ecs.AddSystem(systems.UpdateMovement)
 	ecs.AddSystem(systems.ResolveCollisions)

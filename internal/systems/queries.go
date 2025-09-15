@@ -13,4 +13,5 @@ var (
 	))
 	QDrag       = donburi.NewQuery(filter.Contains(components.DragRes))
 	QSpice      = donburi.NewQuery(filter.Contains(components.SpiceRes, components.Position, components.Sprite))
+	QPlayer     = donburi.NewQuery(filter.Contains(components.PlayerRes))
 )

@@ -92,7 +92,9 @@ func UpdateHarvester(ecs *ecs.ECS) {
 				harvester.State = components.StateUnloading
 			}
 		case components.StateUnloading:
-			// For now, just dump the spice and go back to being idle
+			playerEntry, _ := QPlayer.First(ecs.World)
+			player := components.PlayerRes.Get(playerEntry)
+			player.Money += harvester.CarriedAmount
 			harvester.CarriedAmount = 0
 			harvester.State = components.StateIdle
 		}

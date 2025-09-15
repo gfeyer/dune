@@ -1,6 +1,7 @@
 package systems
 
 import (
+	"fmt"
 	"image/color"
 	"math"
 
@@ -75,6 +76,14 @@ func DrawSprites(ecs *ecs.ECS, screen *ebiten.Image) {
 func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
 	cameraEntry, _ := camera.CameraQuery.First(ecs.World)
 	cam := camera.CameraRes.Get(cameraEntry)
+
+	// Draw player money
+	playerEntry, ok := QPlayer.First(ecs.World)
+	if ok {
+		player := components.PlayerRes.Get(playerEntry)
+		moneyText := fmt.Sprintf("$%d", player.Money)
+		text.Draw(screen, moneyText, basicfont.Face7x13, 10, 20, color.White)
+	}
 
 	// Draw UI elements on top of Trikes
 	qTrikeUI.Each(ecs.World, func(entry *donburi.Entry) {

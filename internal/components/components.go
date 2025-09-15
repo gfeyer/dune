@@ -68,6 +68,10 @@ type Health struct {
 
 type Refinery struct{}
 
+type Player struct {
+	Money int
+}
+
 type Spice struct{}
 
 var (
@@ -84,4 +88,5 @@ var (
 	SpiceAmountRes = donburi.NewComponentType[SpiceAmount]()
 	RefineryRes   = donburi.NewComponentType[Refinery]()
 	HealthRes     = donburi.NewComponentType[Health]()
+	PlayerRes     = donburi.NewComponentType[Player]()
 )
