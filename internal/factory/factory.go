@@ -1,11 +1,14 @@
 package factory
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/gfeyer/ebit/internal/components"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/yohamta/donburi"
+	"golang.org/x/image/font/basicfont"
 )
 
 func CreateHarvester(w donburi.World, x, y float64) {
@@ -67,17 +70,27 @@ func CreateSpice(w donburi.World, x, y float64) {
 	*components.SpiceAmountRes.Get(entry) = components.SpiceAmount{Amount: 1000}
 }
 
-func CreateBuildOption(w donburi.World, btype components.BuildingType, name string, cost int) {
+func CreateBuildOption(w donburi.World, btype components.BuildingType, name string, cost int, width, height int) {
 	e := w.Create(components.BuildInfoRes)
 	entry := w.Entry(e)
 
-	icon := ebiten.NewImage(32, 32)
-	switch btype {
-	case components.BuildingRefinery:
-		icon.Fill(color.RGBA{R: 128, G: 128, B: 128, A: 255}) // Gray for Refinery
-	case components.BuildingBarracks:
-		icon.Fill(color.RGBA{R: 255, G: 0, B: 0, A: 255}) // Red for Barracks
-	}
+	icon := ebiten.NewImage(width, height)
+	bgColor := color.RGBA{R: 0, G: 0, B: 0, A: 255} // Black background
+	icon.Fill(bgColor)
+
+	// Draw text on the icon
+	nameText := name
+	costText := fmt.Sprintf("Cost: %d", cost)
+
+	// Center the name text
+	nameBounds := text.BoundString(basicfont.Face7x13, nameText)
+	nameX := (width - nameBounds.Dx()) / 2
+	text.Draw(icon, nameText, basicfont.Face7x13, nameX, 15, color.White)
+
+	// Center the cost text
+	costBounds := text.BoundString(basicfont.Face7x13, costText)
+	costX := (width - costBounds.Dx()) / 2
+	text.Draw(icon, costText, basicfont.Face7x13, costX, 30, color.White)
 
 	*components.BuildInfoRes.Get(entry) = components.BuildInfo{
 		Type: btype,

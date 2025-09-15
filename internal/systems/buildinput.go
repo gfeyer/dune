@@ -82,15 +82,16 @@ func UpdateBuildInput(ecs *ecs.ECS) {
 
 		menuX := minimap.X
 		menuY := minimap.Y + minimap.Height + 10
-		iconWidth := 32
-		iconHeight := 32
 		padding := 5
-		colWidth := iconWidth + padding
-		rowHeight := iconHeight + padding + 15
+		colWidth := (minimap.Width - padding) / 2
 
 		i := 0
+		rowHeight := colWidth
 		BuildMenuQuery.Each(ecs.World, func(entry *donburi.Entry) {
 			buildInfo := components.BuildInfoRes.Get(entry)
+			iconBounds := buildInfo.Icon.Bounds()
+			iconWidth := iconBounds.Dx()
+			iconHeight := iconBounds.Dy()
 
 			col := i % 2
 			row := i / 2
@@ -99,6 +100,7 @@ func UpdateBuildInput(ecs *ecs.ECS) {
 			iconY := menuY + row*rowHeight
 
 			if mx >= iconX && mx < iconX+iconWidth && my >= iconY && my < iconY+iconHeight {
+				// Clicked on this build option
 				placement.IsPlacing = true
 				placement.BuildingType = buildInfo.Type
 				placement.Icon = buildInfo.Icon

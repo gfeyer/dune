@@ -1,16 +1,11 @@
 package systems
 
 import (
-	"fmt"
-	"image/color"
-
 	"github.com/gfeyer/ebit/internal/components"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 	"github.com/yohamta/donburi/filter"
-	"golang.org/x/image/font/basicfont"
 )
 
 var (
@@ -28,11 +23,9 @@ func DrawBuildMenu(ecs *ecs.ECS, screen *ebiten.Image) {
 	// Menu layout
 	menuX := minimap.X
 	menuY := minimap.Y + minimap.Height + 10 // 10px padding
-	iconWidth := 32
-	iconHeight := 32
 	padding := 5
-	colWidth := iconWidth + padding
-	rowHeight := iconHeight + padding + 15 // Extra space for text
+	colWidth := (minimap.Width - padding) / 2
+	rowHeight := colWidth
 
 	i := 0
 	BuildMenuQuery.Each(ecs.World, func(entry *donburi.Entry) {
@@ -49,10 +42,6 @@ func DrawBuildMenu(ecs *ecs.ECS, screen *ebiten.Image) {
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(float64(iconX), float64(iconY))
 		screen.DrawImage(buildInfo.Icon, opts)
-
-		// Draw cost
-		costText := fmt.Sprintf("$%d", buildInfo.Cost)
-		text.Draw(screen, costText, basicfont.Face7x13, iconX, iconY+iconHeight+12, color.White)
 
 		i++
 	})

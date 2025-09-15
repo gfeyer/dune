@@ -84,8 +84,12 @@ func NewGame(w, h int) *Game {
 	factory.CreateRefinery(world, 50, 50)
 
 	// Create build options
-	factory.CreateBuildOption(world, components.BuildingRefinery, "Refinery", 750)
-	factory.CreateBuildOption(world, components.BuildingBarracks, "Barracks", 250)
+	minimap := components.MinimapRes.Get(mmentry)
+	padding := 5
+	iconWidth := (minimap.Width - padding) / 2
+	iconHeight := 64
+	factory.CreateBuildOption(world, components.BuildingRefinery, "Refinery", 750, iconWidth, iconHeight)
+	factory.CreateBuildOption(world, components.BuildingBarracks, "Barracks", 250, iconWidth, iconHeight)
 
 	// Spawn spice
 	s := settings.GetSettings(world)
