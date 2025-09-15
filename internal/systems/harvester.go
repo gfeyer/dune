@@ -1,6 +1,7 @@
 package systems
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/gfeyer/ebit/internal/components"
@@ -26,17 +27,40 @@ func UpdateHarvester(ecs *ecs.ECS) {
 		p := components.Position.Get(entry)
 		t := components.TargetRes.Get(entry)
 
+		fmt.Println("Harvester is idle, target spice: ", harvester.TargetSpice, " valid: ", ecs.World.Valid(harvester.TargetSpice))
+
 		switch harvester.State {
 		case components.StateIdle:
 			// Harvester is idle, waiting for a command.
 			// If it has a target spice, it means it has completed a loop and should go back.
 			if harvester.TargetSpice != 0 {
+				if !ecs.World.Valid(harvester.TargetSpice) {
+					if harvester.CarriedAmount > 0 {
+						harvester.State = components.StateMovingToRefinery
+					} else {
+						harvester.State = components.StateIdle
+					}
+					harvester.TargetSpice = 0
+					return
+				}
 				harvester.State = components.StateMovingToSpice
 				targetSpiceEntry := ecs.World.Entry(harvester.TargetSpice)
 				spicePos := components.Position.Get(targetSpiceEntry)
 				t.X, t.Y = spicePos.X, spicePos.Y
+
 			}
 		case components.StateMovingToSpice:
+			// Check if target is still valid
+			if !ecs.World.Valid(harvester.TargetSpice) {
+				if harvester.CarriedAmount > 0 {
+					harvester.State = components.StateMovingToRefinery
+				} else {
+					harvester.State = components.StateIdle
+				}
+				harvester.TargetSpice = 0
+				return
+			}
+
 			// Check if arrived at spice
 			targetSpiceEntry := ecs.World.Entry(harvester.TargetSpice)
 			targetSpicePos := components.Position.Get(targetSpiceEntry)
@@ -80,6 +104,15 @@ func UpdateHarvester(ecs *ecs.ECS) {
 			}
 
 			// Harvest spice continuously
+			if !ecs.World.Valid(harvester.TargetSpice) {
+				if harvester.CarriedAmount > 0 {
+					harvester.State = components.StateMovingToRefinery
+				} else {
+					harvester.State = components.StateIdle
+				}
+				harvester.TargetSpice = 0
+				return
+			}
 			targetSpiceEntry := ecs.World.Entry(harvester.TargetSpice)
 			// Check if spice field is depleted
 			if !targetSpiceEntry.HasComponent(components.SpiceAmountRes) {
