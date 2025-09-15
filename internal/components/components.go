@@ -37,6 +37,7 @@ const (
 type HarvesterData struct {
 	State         HarvesterState
 	TargetSpice   donburi.Entity
+	TargetRefinery donburi.Entity
 	HarvestTimer  int
 	CarriedAmount int
 	Capacity      int

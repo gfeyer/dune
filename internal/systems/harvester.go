@@ -54,9 +54,28 @@ func UpdateHarvester(ecs *ecs.ECS) {
 			// If harvester is full, move to refinery
 			if harvester.CarriedAmount >= harvester.Capacity {
 				harvester.State = components.StateMovingToRefinery
-				refineryEntry, _ := qRefinery.First(ecs.World)
-				refineryPos := components.Position.Get(refineryEntry)
-				t.X, t.Y = refineryPos.X, refineryPos.Y
+
+				// Find the closest refinery
+				var closestRefinery *donburi.Entry
+				minDist := math.MaxFloat64
+
+				qRefinery.Each(ecs.World, func(refineryEntry *donburi.Entry) {
+					refineryPos := components.Position.Get(refineryEntry)
+					dx := refineryPos.X - p.X
+					dy := refineryPos.Y - p.Y
+					dist := math.Sqrt(dx*dx + dy*dy)
+
+					if dist < minDist {
+						minDist = dist
+						closestRefinery = refineryEntry
+					}
+				})
+
+				if closestRefinery != nil {
+					harvester.TargetRefinery = closestRefinery.Entity()
+					refineryPos := components.Position.Get(closestRefinery)
+					t.X, t.Y = refineryPos.X, refineryPos.Y
+				}
 				return
 			}
 
@@ -76,15 +95,24 @@ func UpdateHarvester(ecs *ecs.ECS) {
 			// If spice field is empty, find a new one
 			if amountToHarvest == 0 {
 				ecs.World.Remove(targetSpiceEntry.Entity())
+
+				// Go idle and wait for a new command.
 				harvester.State = components.StateIdle
+				harvester.TargetSpice = 0
+				*t = components.Target{}
 				return
 			}
 
 			spiceAmount.Amount -= amountToHarvest
 			harvester.CarriedAmount += amountToHarvest
 		case components.StateMovingToRefinery:
-			refineryEntry, _ := qRefinery.First(ecs.World)
-			refineryPos := components.Position.Get(refineryEntry)
+			if harvester.TargetRefinery == 0 {
+				// Something went wrong, go idle
+				harvester.State = components.StateIdle
+				return
+			}
+			targetRefineryEntry := ecs.World.Entry(harvester.TargetRefinery)
+			refineryPos := components.Position.Get(targetRefineryEntry)
 			dx := refineryPos.X - p.X
 			dy := refineryPos.Y - p.Y
 			dist := math.Sqrt(dx*dx + dy*dy)
