@@ -9,7 +9,7 @@ import (
 	"github.com/yohamta/donburi/filter"
 )
 
-var qCollision = donburi.NewQuery(filter.Contains(components.Position, components.UnitRes))
+var qCollision = donburi.NewQuery(filter.Contains(components.Position, components.UnitRes, components.Sprite))
 
 func ResolveCollisions(ecs *ecs.ECS) {
 	qCollision.Each(ecs.World, func(entry *donburi.Entry) {
@@ -26,8 +26,14 @@ func ResolveCollisions(ecs *ecs.ECS) {
 			dy := p1.Y - p2.Y
 			dist := math.Sqrt(dx*dx + dy*dy)
 
-			if dist < 24 {
-				overlap := (24 - dist) / 2
+			s1 := components.Sprite.Get(entry)
+			s2 := components.Sprite.Get(other)
+			radius1 := float64((*s1).Bounds().Dx()) / 2
+			radius2 := float64((*s2).Bounds().Dx()) / 2
+			requiredDist := radius1 + radius2
+
+			if dist < requiredDist {
+				overlap := (requiredDist - dist) / 2
 				p1.X += dx / dist * overlap
 				p1.Y += dy / dist * overlap
 				p2.X -= dx / dist * overlap

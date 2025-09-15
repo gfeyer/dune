@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	qMovers  = donburi.NewQuery(filter.Contains(components.Position, components.Velocity, components.Sprite))
+	qMovers  = donburi.NewQuery(filter.Contains(components.Position, components.Velocity, components.Sprite, components.TargetRes))
 	qSettings = donburi.NewQuery(filter.Contains(settings.SettingsRes))
 )
 
