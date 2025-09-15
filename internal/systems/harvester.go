@@ -11,8 +11,8 @@ import (
 
 var (
 	qHarvesters = donburi.NewQuery(filter.Contains(components.UnitRes, components.HarvesterRes, components.Position, components.TargetRes))
-	qSpice    = donburi.NewQuery(filter.Contains(components.SpiceRes, components.SpiceAmountRes, components.Position))
-	qRefinery = donburi.NewQuery(filter.Contains(components.RefineryRes, components.Position))
+	qSpice      = donburi.NewQuery(filter.Contains(components.SpiceRes, components.SpiceAmountRes, components.Position))
+	qRefinery   = donburi.NewQuery(filter.Contains(components.RefineryRes, components.Position))
 )
 
 func UpdateHarvester(ecs *ecs.ECS) {
@@ -92,7 +92,7 @@ func UpdateHarvester(ecs *ecs.ECS) {
 				amountToHarvest = spiceAmount.Amount
 			}
 
-			// If spice field is empty, find a new one
+			// If spice field is empty, go idle
 			if amountToHarvest == 0 {
 				ecs.World.Remove(targetSpiceEntry.Entity())
 
