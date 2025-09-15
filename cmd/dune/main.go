@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	const W, H = 800, 480
+	const W, H = 1280, 720
 
 	ebiten.SetWindowSize(W, H)
 	ebiten.SetWindowTitle("Dune II")
