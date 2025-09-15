@@ -21,7 +21,7 @@ var (
 )
 
 func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
-	screen.Fill(color.RGBA{10, 12, 17, 255}) // clear
+	screen.Fill(color.RGBA{210, 180, 140, 255}) // sand color
 
 	cameraEntry, _ := camera.CameraQuery.First(ecs.World)
 	cam := camera.CameraRes.Get(cameraEntry)
@@ -41,4 +41,13 @@ func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 			vector.StrokeRect(screen, float32(p.X-cam.X), float32(p.Y-cam.Y), float32(bounds.Dx()), float32(bounds.Dy()), 1, color.White, false)
 		}
 	})
+
+	// Draw drag selection
+	dragEntry, ok := QDrag.First(ecs.World)
+	if ok {
+		drag := components.DragRes.Get(dragEntry)
+		if drag.IsDragging {
+			vector.StrokeRect(screen, float32(drag.StartX), float32(drag.StartY), float32(drag.EndX-drag.StartX), float32(drag.EndY-drag.StartY), 1, color.White, false)
+		}
+	}
 }

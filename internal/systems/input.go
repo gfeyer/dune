@@ -7,11 +7,44 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
+	"image"
 )
 
 
 func UpdateInput(ecs *ecs.ECS) {
-	// Left-click to select
+	dragEntry, _ := QDrag.First(ecs.World)
+	drag := components.DragRes.Get(dragEntry)
+
+	// Drag selection
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		drag.IsDragging = true
+		drag.StartX, drag.StartY = ebiten.CursorPosition()
+	}
+	if drag.IsDragging {
+		drag.EndX, drag.EndY = ebiten.CursorPosition()
+	}
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
+		drag.IsDragging = false
+
+		// Deselect all units first
+		QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
+			components.SelectableRes.Get(entry).Selected = false
+		})
+
+		// Select units within the drag rectangle
+		cameraEntry, _ := camera.CameraQuery.First(ecs.World)
+		cam := camera.CameraRes.Get(cameraEntry)
+		rect := image.Rect(drag.StartX, drag.StartY, drag.EndX, drag.EndY).Canon()
+		QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
+			p := components.Position.Get(entry)
+			screenX, screenY := int(p.X-cam.X), int(p.Y-cam.Y)
+			if image.Pt(screenX, screenY).In(rect) {
+				components.SelectableRes.Get(entry).Selected = true
+			}
+		})
+	}
+
+	// Single-click selection
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		// Get camera and mouse position
 		cameraEntry, _ := camera.CameraQuery.First(ecs.World)

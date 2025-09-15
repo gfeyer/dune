@@ -8,4 +8,5 @@ import (
 
 var (
 	QSelectable = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.SelectableRes))
+	QDrag       = donburi.NewQuery(filter.Contains(components.DragRes))
 )

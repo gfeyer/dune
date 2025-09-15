@@ -9,7 +9,7 @@ import (
 )
 
 func CreateHarvester(w donburi.World, x, y float64) {
-		e := w.Create(components.Position, components.Sprite, components.UnitRes, components.SelectableRes, components.TargetRes, components.Velocity)
+	e := w.Create(components.Position, components.Sprite, components.UnitRes, components.SelectableRes, components.TargetRes, components.Velocity)
 	entry := w.Entry(e)
 
 	// Harvester is a blue square
@@ -19,12 +19,12 @@ func CreateHarvester(w donburi.World, x, y float64) {
 	*components.Position.Get(entry) = components.Pos{X: x, Y: y}
 	*components.Sprite.Get(entry) = img
 	*components.UnitRes.Get(entry) = components.Unit{Type: components.Harvester}
-		*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
+	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
 	*components.Velocity.Get(entry) = components.Vel{}
 }
 
 func CreateTrike(w donburi.World, x, y float64) {
-		e := w.Create(components.Position, components.Sprite, components.UnitRes, components.SelectableRes, components.TargetRes, components.Velocity)
+	e := w.Create(components.Position, components.Sprite, components.UnitRes, components.SelectableRes, components.TargetRes, components.Velocity)
 	entry := w.Entry(e)
 
 	// Trike is a blue triangle
@@ -43,6 +43,6 @@ func CreateTrike(w donburi.World, x, y float64) {
 	*components.Position.Get(entry) = components.Pos{X: x, Y: y}
 	*components.Sprite.Get(entry) = img
 	*components.UnitRes.Get(entry) = components.Unit{Type: components.Trike}
-		*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
+	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
 	*components.Velocity.Get(entry) = components.Vel{}
 }

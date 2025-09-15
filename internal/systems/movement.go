@@ -35,8 +35,8 @@ func UpdateMovement(ecs *ecs.ECS) {
 				v.X, v.Y = 0, 0
 				*t = components.Target{}
 			} else {
-				v.X = (dx / dist) * 120
-				v.Y = (dy / dist) * 120
+				v.X = (dx / dist) * 240
+				v.Y = (dy / dist) * 240
 			}
 		}
 

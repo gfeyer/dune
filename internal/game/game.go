@@ -25,8 +25,8 @@ func NewGame(w, h int) *Game {
 	*settings.SettingsRes.Get(entry) = settings.Settings{
 		ScreenWidth:  w,
 		ScreenHeight: h,
-		MapWidth:     w * 2,
-		MapHeight:    h * 2,
+		MapWidth:     w * 4,
+		MapHeight:    h * 4,
 	}
 
 	// Register camera
@@ -43,6 +43,11 @@ func NewGame(w, h int) *Game {
 		X:      w - 160,
 		Y:      10,
 	}
+
+	// Create drag selection
+	de := world.Create(components.DragRes)
+	dentry := world.Entry(de)
+	*components.DragRes.Get(dentry) = components.Drag{}
 
 	// Register systems
 	ecs.AddSystem(systems.UpdateMovement)

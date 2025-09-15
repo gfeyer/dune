@@ -33,6 +33,12 @@ type Minimap struct {
 	X, Y          int
 }
 
+type Drag struct {
+	IsDragging    bool
+	StartX, StartY int
+	EndX, EndY     int
+}
+
 var (
 	Position   = donburi.NewComponentType[Pos]()
 	Velocity   = donburi.NewComponentType[Vel]()
@@ -41,4 +47,5 @@ var (
 	SelectableRes = donburi.NewComponentType[Selectable]()
 	TargetRes     = donburi.NewComponentType[Target]()
 	MinimapRes    = donburi.NewComponentType[Minimap]()
+	DragRes       = donburi.NewComponentType[Drag]()
 )
