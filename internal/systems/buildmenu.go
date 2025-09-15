@@ -24,8 +24,8 @@ func DrawBuildMenu(ecs *ecs.ECS, screen *ebiten.Image) {
 	menuX := minimap.X
 	menuY := minimap.Y + minimap.Height + 10 // 10px padding
 	padding := 5
-	colWidth := (minimap.Width - padding) / 2
-	rowHeight := colWidth
+	iconWidth := (minimap.Width - padding) / 2
+	iconHeight := iconWidth // Square tiles
 
 	i := 0
 	BuildMenuQuery.Each(ecs.World, func(entry *donburi.Entry) {
@@ -34,9 +34,9 @@ func DrawBuildMenu(ecs *ecs.ECS, screen *ebiten.Image) {
 		col := i % 2
 		row := i / 2
 
-		// Calculate position for the icon
-		iconX := menuX + col*colWidth
-		iconY := menuY + row*rowHeight
+		// Calculate position for the icon with padding
+		iconX := menuX + col*(iconWidth+padding)
+		iconY := menuY + row*(iconHeight+padding)
 
 		// Draw icon
 		opts := &ebiten.DrawImageOptions{}

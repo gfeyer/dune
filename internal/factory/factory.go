@@ -75,7 +75,7 @@ func CreateBuildOption(w donburi.World, btype components.BuildingType, name stri
 	entry := w.Entry(e)
 
 	icon := ebiten.NewImage(width, height)
-	bgColor := color.RGBA{R: 0, G: 0, B: 0, A: 255} // Black background
+	bgColor := color.RGBA{R: 128, G: 128, B: 128, A: 255} // Gray background
 	icon.Fill(bgColor)
 
 	// Draw text on the icon
