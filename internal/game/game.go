@@ -63,7 +63,7 @@ func NewGame(w, h int) *Game {
 	// Register renderers
 	ecs.AddRenderer(systems.LayerSprites, systems.DrawSprites)
 	ecs.AddRenderer(systems.LayerUI, systems.DrawUI)
-	ecs.AddRenderer(systems.LayerUI+1, systems.DrawMinimap)
+	ecs.AddRenderer(systems.LayerMinimap, systems.DrawMinimap)
 
 	// Spawn initial units
 	factory.CreateTrike(world, 100, 100)
@@ -90,7 +90,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{210, 180, 140, 255}) // sand color
 	g.ecs.DrawLayer(systems.LayerSprites, screen)
 	g.ecs.DrawLayer(systems.LayerUI, screen)
-	g.ecs.DrawLayer(systems.LayerUI+1, screen)
+	g.ecs.DrawLayer(systems.LayerMinimap, screen)
 }
 
 func (g *Game) Layout(outsideW, outsideH int) (int, int) {

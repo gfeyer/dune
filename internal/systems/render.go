@@ -17,8 +17,10 @@ import (
 )
 
 const (
-	LayerSprites ecs.LayerID = iota
-	LayerUI
+	LayerSprites ecs.LayerID = iota // 0
+	LayerUI                         // 1 (in-world UI like health bars)
+	LayerMinimap                    // 2
+	LayerMenus                      // 3 (for future build menus etc.)
 )
 
 var (
