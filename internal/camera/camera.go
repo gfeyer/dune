@@ -4,6 +4,7 @@ import (
 	"github.com/gfeyer/ebit/internal/settings"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/yohamta/donburi"
+	"github.com/yohamta/donburi/ecs"
 	"github.com/yohamta/donburi/filter"
 )
 
@@ -19,11 +20,11 @@ var (
 )
 
 // Update handles camera movement.
-func Update(w donburi.World) {
-	cameraEntry, _ := CameraQuery.First(w)
+func Update(ecs *ecs.ECS) {
+	cameraEntry, _ := CameraQuery.First(ecs.World)
 	cam := CameraRes.Get(cameraEntry)
 
-	s, _ := settings.SettingsQuery.First(w)
+	s, _ := settings.SettingsQuery.First(ecs.World)
 	settings := settings.SettingsRes.Get(s)
 
 	// Pan with arrow keys
