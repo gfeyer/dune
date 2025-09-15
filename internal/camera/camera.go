@@ -15,8 +15,8 @@ type Camera struct {
 
 var CameraRes = donburi.NewComponentType[Camera]()
 
-var ( 
-    CameraQuery = donburi.NewQuery(filter.Contains(CameraRes))
+var (
+	CameraQuery = donburi.NewQuery(filter.Contains(CameraRes))
 )
 
 // Update handles camera movement.
@@ -25,7 +25,7 @@ func Update(ecs *ecs.ECS) {
 	cam := CameraRes.Get(cameraEntry)
 
 	settings := settings.GetSettings(ecs.World)
-	
+
 	// Pan with arrow keys
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
 		cam.X -= 5
