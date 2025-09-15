@@ -23,7 +23,11 @@ const (
 
 var (
 	qSprites = donburi.NewQuery(filter.Contains(components.Position, components.Sprite))
-	qUnitUI  = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.UnitRes, components.HealthRes))
+	qTrikeUI = donburi.NewQuery(filter.And(
+		filter.Contains(components.Position, components.Sprite, components.UnitRes, components.HealthRes),
+		filter.Not(filter.Contains(components.HarvesterRes)),
+	))
+	qHarvesterUI = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.UnitRes, components.HealthRes, components.HarvesterRes))
 )
 
 func DrawSprites(ecs *ecs.ECS, screen *ebiten.Image) {
@@ -69,12 +73,29 @@ func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
 	cameraEntry, _ := camera.CameraQuery.First(ecs.World)
 	cam := camera.CameraRes.Get(cameraEntry)
 
-	// Draw UI elements on top of units
-	qUnitUI.Each(ecs.World, func(entry *donburi.Entry) {
+	// Draw UI elements on top of Trikes
+	qTrikeUI.Each(ecs.World, func(entry *donburi.Entry) {
 		p := components.Position.Get(entry)
 		img := components.Sprite.Get(entry)
 		health := components.HealthRes.Get(entry)
-		unit := components.UnitRes.Get(entry)
+		barWidth := float32((*img).Bounds().Dx())
+
+		// Health bar
+		healthBarY := float32(p.Y-cam.Y) - 8
+		healthPercentage := float32(health.Current) / float32(health.Max)
+		vector.DrawFilledRect(screen, float32(p.X-cam.X), healthBarY, barWidth, 4, color.RGBA{R: 255, A: 255}, false)
+		vector.DrawFilledRect(screen, float32(p.X-cam.X), healthBarY, barWidth*healthPercentage, 4, color.RGBA{G: 255, A: 255}, false)
+
+		// Unit label
+		labelY := int(healthBarY) - 2
+		text.Draw(screen, "Trike", basicfont.Face7x13, int(p.X-cam.X), labelY, color.White)
+	})
+
+	// Draw UI elements on top of Harvesters
+	qHarvesterUI.Each(ecs.World, func(entry *donburi.Entry) {
+		p := components.Position.Get(entry)
+		img := components.Sprite.Get(entry)
+		health := components.HealthRes.Get(entry)
 		barWidth := float32((*img).Bounds().Dx())
 
 		// Health bar
@@ -84,23 +105,15 @@ func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
 		vector.DrawFilledRect(screen, float32(p.X-cam.X), healthBarY, barWidth*healthPercentage, 4, color.RGBA{G: 255, A: 255}, false)
 
 		// Spice bar for Harvester
-		if unit.Type == components.Harvester {
-			harvester := components.HarvesterRes.Get(entry)
-			spiceBarY := healthBarY + 5
-			spicePercentage := float32(harvester.CarriedAmount) / float32(harvester.Capacity)
-			vector.DrawFilledRect(screen, float32(p.X-cam.X), spiceBarY, barWidth, 2, color.RGBA{R: 255, G: 165, A: 255}, false)
-			vector.DrawFilledRect(screen, float32(p.X-cam.X), spiceBarY, barWidth*spicePercentage, 2, color.RGBA{R: 255, G: 140, B: 0, A: 255}, false)
-		}
+		harvester := components.HarvesterRes.Get(entry)
+		spiceBarY := healthBarY + 5
+		spicePercentage := float32(harvester.CarriedAmount) / float32(harvester.Capacity)
+		vector.DrawFilledRect(screen, float32(p.X-cam.X), spiceBarY, barWidth, 2, color.RGBA{R: 255, G: 165, A: 255}, false)
+		vector.DrawFilledRect(screen, float32(p.X-cam.X), spiceBarY, barWidth*spicePercentage, 2, color.RGBA{R: 255, G: 140, B: 0, A: 255}, false)
 
 		// Unit label
 		labelY := int(healthBarY) - 2
-		var label string
-		if unit.Type == components.Harvester {
-			label = "Harvester"
-		} else {
-			label = "Trike"
-		}
-		text.Draw(screen, label, basicfont.Face7x13, int(p.X-cam.X), labelY, color.White)
+		text.Draw(screen, "Harvester", basicfont.Face7x13, int(p.X-cam.X), labelY, color.White)
 	})
 
 	// Draw drag selection

@@ -28,24 +28,12 @@ func UpdateHarvester(ecs *ecs.ECS) {
 
 		switch harvester.State {
 		case components.StateIdle:
-			// Find nearest spice
-			var nearestSpice *donburi.Entry
-			minDist := math.MaxFloat64
-			qSpice.Each(ecs.World, func(spiceEntry *donburi.Entry) {
-				spicePos := components.Position.Get(spiceEntry)
-				dx := spicePos.X - p.X
-				dy := spicePos.Y - p.Y
-				dist := math.Sqrt(dx*dx + dy*dy)
-				if dist < minDist {
-					minDist = dist
-					nearestSpice = spiceEntry
-				}
-			})
-
-			if nearestSpice != nil {
+			// Harvester is idle, waiting for a command.
+			// If it has a target spice, it means it has completed a loop and should go back.
+			if harvester.TargetSpice != 0 {
 				harvester.State = components.StateMovingToSpice
-				harvester.TargetSpice = nearestSpice.Entity()
-				spicePos := components.Position.Get(nearestSpice)
+				targetSpiceEntry := ecs.World.Entry(harvester.TargetSpice)
+				spicePos := components.Position.Get(targetSpiceEntry)
 				t.X, t.Y = spicePos.X, spicePos.Y
 			}
 		case components.StateMovingToSpice:
@@ -57,29 +45,43 @@ func UpdateHarvester(ecs *ecs.ECS) {
 			dist := math.Sqrt(dx*dx + dy*dy)
 			if dist < 32 { // Close enough to harvest
 				harvester.State = components.StateHarvesting
-				harvester.HarvestTimer = 180 // 3 seconds
+				// Stop moving
+				v := components.Velocity.Get(entry)
+				v.X, v.Y = 0, 0
+				*t = components.Target{}
 			}
 		case components.StateHarvesting:
-			harvester.HarvestTimer--
-			if harvester.HarvestTimer <= 0 {
-				targetSpiceEntry := ecs.World.Entry(harvester.TargetSpice)
-				spiceAmount := components.SpiceAmountRes.Get(targetSpiceEntry)
-				amountToHarvest := 10
-				if spiceAmount.Amount < amountToHarvest {
-					amountToHarvest = spiceAmount.Amount
-				}
-				spiceAmount.Amount -= amountToHarvest
-				harvester.CarriedAmount += amountToHarvest
-
-				if harvester.CarriedAmount >= harvester.Capacity {
-					harvester.State = components.StateMovingToRefinery
-					refineryEntry, _ := qRefinery.First(ecs.World)
-					refineryPos := components.Position.Get(refineryEntry)
-					t.X, t.Y = refineryPos.X, refineryPos.Y
-				} else {
-					harvester.State = components.StateIdle
-				}
+			// If harvester is full, move to refinery
+			if harvester.CarriedAmount >= harvester.Capacity {
+				harvester.State = components.StateMovingToRefinery
+				refineryEntry, _ := qRefinery.First(ecs.World)
+				refineryPos := components.Position.Get(refineryEntry)
+				t.X, t.Y = refineryPos.X, refineryPos.Y
+				return
 			}
+
+			// Harvest spice continuously
+			targetSpiceEntry := ecs.World.Entry(harvester.TargetSpice)
+			// Check if spice field is depleted
+			if !targetSpiceEntry.HasComponent(components.SpiceAmountRes) {
+				harvester.State = components.StateIdle
+				return
+			}
+			spiceAmount := components.SpiceAmountRes.Get(targetSpiceEntry)
+			amountToHarvest := 1
+			if spiceAmount.Amount < amountToHarvest {
+				amountToHarvest = spiceAmount.Amount
+			}
+
+			// If spice field is empty, find a new one
+			if amountToHarvest == 0 {
+				ecs.World.Remove(targetSpiceEntry.Entity())
+				harvester.State = components.StateIdle
+				return
+			}
+
+			spiceAmount.Amount -= amountToHarvest
+			harvester.CarriedAmount += amountToHarvest
 		case components.StateMovingToRefinery:
 			refineryEntry, _ := qRefinery.First(ecs.World)
 			refineryPos := components.Position.Get(refineryEntry)

@@ -78,16 +78,43 @@ func UpdateInput(ecs *ecs.ECS) {
 		}
 	}
 
-	// Right-click to move
+	// Right-click to move or harvest
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
 		cameraEntry, _ := camera.CameraQuery.First(ecs.World)
 		cam := camera.CameraRes.Get(cameraEntry)
 		mx, my := ebiten.CursorPosition()
 		wx, wy := float64(mx)+cam.X, float64(my)+cam.Y
 
+		// Check if the click was on a spice field
+		var targetSpice *donburi.Entry
+		QSpice.Each(ecs.World, func(spiceEntry *donburi.Entry) {
+			spicePos := components.Position.Get(spiceEntry)
+			spiceSprite := components.Sprite.Get(spiceEntry)
+			bounds := (*spiceSprite).Bounds()
+			if wx >= spicePos.X && wx < spicePos.X+float64(bounds.Dx()) && wy >= spicePos.Y && wy < spicePos.Y+float64(bounds.Dy()) {
+				targetSpice = spiceEntry
+			}
+		})
+
 		QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
 			if components.SelectableRes.Get(entry).Selected {
-				*components.TargetRes.Get(entry) = components.Target{X: wx, Y: wy}
+				unit := components.UnitRes.Get(entry)
+				// If it's a harvester and a spice field was clicked, set it as the target
+				if unit.Type == components.Harvester && targetSpice != nil {
+					harvester := components.HarvesterRes.Get(entry)
+					harvester.State = components.StateMovingToSpice
+					harvester.TargetSpice = targetSpice.Entity()
+					spicePos := components.Position.Get(targetSpice)
+					*components.TargetRes.Get(entry) = components.Target{X: spicePos.X, Y: spicePos.Y}
+				} else { // Otherwise, it's a normal move command
+					*components.TargetRes.Get(entry) = components.Target{X: wx, Y: wy}
+					// If it was a harvester, clear its spice target
+					if unit.Type == components.Harvester {
+						harvester := components.HarvesterRes.Get(entry)
+						harvester.State = components.StateIdle
+						harvester.TargetSpice = 0
+					}
+				}
 			}
 		})
 	}
