@@ -22,6 +22,7 @@ var (
 	))
 	qHarvesterUI = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.UnitRes, components.HealthRes, components.HarvesterRes))
 	qRefineryUI  = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.RefineryRes))
+	qBarracksUI  = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.BarracksRes))
 )
 
 func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
@@ -84,6 +85,13 @@ func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
 		p := components.Position.Get(entry)
 		labelY := int(p.Y-cam.Y) - 2
 		text.Draw(screen, "Refinery", basicfont.Face7x13, int(p.X-cam.X), labelY, color.White)
+	})
+
+	// Draw UI elements on top of Barracks
+	qBarracksUI.Each(ecs.World, func(entry *donburi.Entry) {
+		p := components.Position.Get(entry)
+		labelY := int(p.Y-cam.Y) - 2
+		text.Draw(screen, "Barracks", basicfont.Face7x13, int(p.X-cam.X), labelY, color.White)
 	})
 
 	// Draw drag selection
