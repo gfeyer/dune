@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/gfeyer/ebit/internal/camera"
+	"github.com/gfeyer/ebit/internal/components"
 	"github.com/gfeyer/ebit/internal/factory"
 	"github.com/gfeyer/ebit/internal/settings"
 	"github.com/gfeyer/ebit/internal/systems"
@@ -33,13 +34,25 @@ func NewGame(w, h int) *Game {
 	centry := world.Entry(ce)
 	*camera.CameraRes.Get(centry) = camera.Camera{}
 
+	// Create minimap
+	mme := world.Create(components.MinimapRes)
+	mmentry := world.Entry(mme)
+	*components.MinimapRes.Get(mmentry) = components.Minimap{
+		Width:  150,
+		Height: 100,
+		X:      w - 160,
+		Y:      10,
+	}
+
 	// Register systems
 	ecs.AddSystem(systems.UpdateMovement)
 	ecs.AddSystem(systems.UpdateInput)
 	ecs.AddSystem(camera.Update)
+	ecs.AddSystem(systems.UpdateMinimap)
 
 	// Register renderers
 	ecs.AddRenderer(systems.LayerDefault, systems.Draw)
+	ecs.AddRenderer(systems.LayerDefault+1, systems.DrawMinimap)
 
 	// Spawn initial units
 	factory.CreateTrike(world, 100, 100)

@@ -7,12 +7,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
-	"github.com/yohamta/donburi/filter"
 )
 
-var (
-	qSelectable = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.SelectableRes))
-)
 
 func UpdateInput(ecs *ecs.ECS) {
 	// Left-click to select
@@ -24,7 +20,7 @@ func UpdateInput(ecs *ecs.ECS) {
 		wx, wy := float64(mx)+cam.X, float64(my)+cam.Y
 
 		clickedOnUnit := false
-		qSelectable.Each(ecs.World, func(entry *donburi.Entry) {
+		QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
 			p := components.Position.Get(entry)
 			s := components.Sprite.Get(entry)
 			sel := components.SelectableRes.Get(entry)
@@ -41,7 +37,7 @@ func UpdateInput(ecs *ecs.ECS) {
 
 		// If we didn't click on any unit, deselect all
 		if !clickedOnUnit {
-			qSelectable.Each(ecs.World, func(entry *donburi.Entry) {
+			QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
 				components.SelectableRes.Get(entry).Selected = false
 			})
 		}
@@ -54,7 +50,7 @@ func UpdateInput(ecs *ecs.ECS) {
 		mx, my := ebiten.CursorPosition()
 		wx, wy := float64(mx)+cam.X, float64(my)+cam.Y
 
-		qSelectable.Each(ecs.World, func(entry *donburi.Entry) {
+		QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
 			if components.SelectableRes.Get(entry).Selected {
 				*components.TargetRes.Get(entry) = components.Target{X: wx, Y: wy}
 			}

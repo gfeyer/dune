@@ -28,6 +28,11 @@ type Target struct {
 	X, Y float64
 }
 
+type Minimap struct {
+	Width, Height int
+	X, Y          int
+}
+
 var (
 	Position   = donburi.NewComponentType[Pos]()
 	Velocity   = donburi.NewComponentType[Vel]()
@@ -35,4 +40,5 @@ var (
 	UnitRes    = donburi.NewComponentType[Unit]()
 	SelectableRes = donburi.NewComponentType[Selectable]()
 	TargetRes     = donburi.NewComponentType[Target]()
+	MinimapRes    = donburi.NewComponentType[Minimap]()
 )
