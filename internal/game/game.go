@@ -41,9 +41,9 @@ func NewGame(w, h int) *Game {
 	mme := world.Create(components.MinimapRes)
 	mmentry := world.Entry(mme)
 	*components.MinimapRes.Get(mmentry) = components.Minimap{
-		Width:  150,
-		Height: 100,
-		X:      w - 160,
+		Width:  w / 5,
+		Height: h / 5,
+		X:      w - w/5 - 10,
 		Y:      10,
 	}
 
