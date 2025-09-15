@@ -39,6 +39,8 @@ type Drag struct {
 	EndX, EndY     int
 }
 
+type Spice struct{}
+
 var (
 	Position   = donburi.NewComponentType[Pos]()
 	Velocity   = donburi.NewComponentType[Vel]()
@@ -48,4 +50,5 @@ var (
 	TargetRes     = donburi.NewComponentType[Target]()
 	MinimapRes    = donburi.NewComponentType[Minimap]()
 	DragRes       = donburi.NewComponentType[Drag]()
+	SpiceRes      = donburi.NewComponentType[Spice]()
 )

@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	qSprites = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.Velocity))
+	qSprites = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.Velocity, components.SelectableRes))
 )
 
 func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
@@ -30,8 +30,8 @@ func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	qSprites.Each(ecs.World, func(entry *donburi.Entry) {
 		p := components.Position.Get(entry)
 		img := components.Sprite.Get(entry)
-
 		v := components.Velocity.Get(entry)
+		sel := components.SelectableRes.Get(entry)
 
 		// Draw sprite
 		op := &ebiten.DrawImageOptions{}
@@ -51,13 +51,13 @@ func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 			op.GeoM.Translate(p.X-cam.X, p.Y-cam.Y)
 		}
 
-		screen.DrawImage(*img, op)
-
-		// Draw selection indicator
-		if components.SelectableRes.Get(entry).Selected {
-			bounds := (*img).Bounds()
-			vector.StrokeRect(screen, float32(p.X-cam.X), float32(p.Y-cam.Y), float32(bounds.Dx()), float32(bounds.Dy()), 1, color.White, false)
+		// Whiten selected units
+		if sel.Selected {
+			cs := op.ColorScale
+			cs.Scale(1.5, 1.5, 1.5, 1)
+			op.ColorScale = cs
 		}
+		screen.DrawImage(*img, op)
 	})
 
 	// Draw drag selection

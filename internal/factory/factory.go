@@ -47,3 +47,16 @@ func CreateTrike(w donburi.World, x, y float64) {
 	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
 	*components.Velocity.Get(entry) = components.Vel{}
 }
+
+func CreateSpice(w donburi.World, x, y float64) {
+	e := w.Create(components.Position, components.Sprite, components.SpiceRes)
+	entry := w.Entry(e)
+
+	// Spice is an orange square
+	img := ebiten.NewImage(8, 8)
+	img.Fill(color.RGBA{R: 210, G: 105, B: 30, A: 255})
+
+	*components.Position.Get(entry) = components.Pos{X: x, Y: y}
+	*components.Sprite.Get(entry) = img
+	*components.SpiceRes.Get(entry) = components.Spice{}
+}

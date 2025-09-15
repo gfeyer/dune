@@ -1,6 +1,8 @@
 package game
 
 import (
+	"math/rand"
+
 	"github.com/gfeyer/ebit/internal/camera"
 	"github.com/gfeyer/ebit/internal/components"
 	"github.com/gfeyer/ebit/internal/factory"
@@ -51,6 +53,7 @@ func NewGame(w, h int) *Game {
 
 	// Register systems
 	ecs.AddSystem(systems.UpdateMovement)
+	ecs.AddSystem(systems.ResolveCollisions)
 	ecs.AddSystem(systems.UpdateInput)
 	ecs.AddSystem(camera.Update)
 	ecs.AddSystem(systems.UpdateMinimap)
@@ -62,6 +65,14 @@ func NewGame(w, h int) *Game {
 	// Spawn initial units
 	factory.CreateTrike(world, 100, 100)
 	factory.CreateHarvester(world, 200, 200)
+
+	// Spawn spice
+	s := settings.GetSettings(world)
+	for i := 0; i < 50; i++ {
+		x := rand.Float64() * float64(s.MapWidth)
+		y := rand.Float64() * float64(s.MapHeight)
+		factory.CreateSpice(world, x, y)
+	}
 
 	return &Game{ecs: ecs}
 }
