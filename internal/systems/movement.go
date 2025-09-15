@@ -2,16 +2,21 @@ package systems
 
 import (
 	"github.com/gfeyer/ebit/internal/components"
+	"github.com/gfeyer/ebit/internal/settings"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/filter"
 )
 
 var (
-	qMovers = donburi.NewQuery(filter.Contains(components.Position, components.Velocity, components.Sprite))
+	qMovers  = donburi.NewQuery(filter.Contains(components.Position, components.Velocity, components.Sprite))
+	qSettings = donburi.NewQuery(filter.Contains(settings.SettingsRes))
 )
 
-func UpdateMovement(w donburi.World, screenW, screenH int) {
+func UpdateMovement(w donburi.World) {
 	const dt = 1.0 / 60.0
+
+	settingsEntry, _ := qSettings.First(w)
+	s := settings.SettingsRes.Get(settingsEntry)
 
 	qMovers.Each(w, func(entry *donburi.Entry) {
 		p := components.Position.Get(entry)
@@ -31,12 +36,12 @@ func UpdateMovement(w donburi.World, screenW, screenH int) {
 			p.Y = 0
 			v.Y = -v.Y
 		}
-		if p.X+float64(sw) > float64(screenW) {
-			p.X = float64(screenW - sw)
+		if p.X+float64(sw) > float64(s.ScreenWidth) {
+			p.X = float64(s.ScreenWidth - sw)
 			v.X = -v.X
 		}
-		if p.Y+float64(sh) > float64(screenH) {
-			p.Y = float64(screenH - sh)
+		if p.Y+float64(sh) > float64(s.ScreenHeight) {
+			p.Y = float64(s.ScreenHeight - sh)
 			v.Y = -v.Y
 		}
 	})
