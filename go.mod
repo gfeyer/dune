@@ -7,6 +7,7 @@ toolchain go1.24.7
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.8.8
 	github.com/yohamta/donburi v1.15.7
+	golang.org/x/image v0.20.0
 )
 
 require (

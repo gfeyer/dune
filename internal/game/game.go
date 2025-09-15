@@ -57,6 +57,7 @@ func NewGame(w, h int) *Game {
 	ecs.AddSystem(systems.UpdateInput)
 	ecs.AddSystem(camera.Update)
 	ecs.AddSystem(systems.UpdateMinimap)
+	ecs.AddSystem(systems.UpdateHarvester)
 
 	// Register renderers
 	ecs.AddRenderer(systems.LayerDefault, systems.Draw)
@@ -65,6 +66,7 @@ func NewGame(w, h int) *Game {
 	// Spawn initial units
 	factory.CreateTrike(world, 100, 100)
 	factory.CreateHarvester(world, 200, 200)
+	factory.CreateRefinery(world, 50, 50)
 
 	// Spawn spice
 	s := settings.GetSettings(world)

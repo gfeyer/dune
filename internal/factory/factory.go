@@ -9,7 +9,7 @@ import (
 )
 
 func CreateHarvester(w donburi.World, x, y float64) {
-	e := w.Create(components.Position, components.Sprite, components.UnitRes, components.SelectableRes, components.TargetRes, components.Velocity)
+	e := w.Create(components.Position, components.Sprite, components.UnitRes, components.SelectableRes, components.TargetRes, components.Velocity, components.HarvesterRes, components.HealthRes)
 	entry := w.Entry(e)
 
 	// Harvester is a blue square
@@ -21,10 +21,12 @@ func CreateHarvester(w donburi.World, x, y float64) {
 	*components.UnitRes.Get(entry) = components.Unit{Type: components.Harvester}
 	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
 	*components.Velocity.Get(entry) = components.Vel{}
+	*components.HarvesterRes.Get(entry) = components.HarvesterData{Capacity: 100}
+	*components.HealthRes.Get(entry) = components.Health{Current: 100, Max: 100}
 }
 
 func CreateTrike(w donburi.World, x, y float64) {
-	e := w.Create(components.Position, components.Sprite, components.UnitRes, components.SelectableRes, components.TargetRes, components.Velocity)
+	e := w.Create(components.Position, components.Sprite, components.UnitRes, components.SelectableRes, components.TargetRes, components.Velocity, components.HealthRes)
 	entry := w.Entry(e)
 
 	// Trike is a blue triangle
@@ -46,10 +48,11 @@ func CreateTrike(w donburi.World, x, y float64) {
 	*components.UnitRes.Get(entry) = components.Unit{Type: components.Trike}
 	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
 	*components.Velocity.Get(entry) = components.Vel{}
+	*components.HealthRes.Get(entry) = components.Health{Current: 50, Max: 50}
 }
 
 func CreateSpice(w donburi.World, x, y float64) {
-	e := w.Create(components.Position, components.Sprite, components.SpiceRes, components.Velocity, components.SelectableRes)
+	e := w.Create(components.Position, components.Sprite, components.SpiceRes, components.Velocity, components.SelectableRes, components.SpiceAmountRes)
 	entry := w.Entry(e)
 
 	// Spice is an orange square
@@ -61,4 +64,18 @@ func CreateSpice(w donburi.World, x, y float64) {
 	*components.SpiceRes.Get(entry) = components.Spice{}
 	*components.Velocity.Get(entry) = components.Vel{}
 	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
+	*components.SpiceAmountRes.Get(entry) = components.SpiceAmount{Amount: 1000}
+}
+
+func CreateRefinery(w donburi.World, x, y float64) {
+	e := w.Create(components.Position, components.Sprite, components.RefineryRes)
+	entry := w.Entry(e)
+
+	// Refinery is a gray square
+	img := ebiten.NewImage(64, 64)
+	img.Fill(color.RGBA{R: 128, G: 128, B: 128, A: 255})
+
+	*components.Position.Get(entry) = components.Pos{X: x, Y: y}
+	*components.Sprite.Get(entry) = img
+	*components.RefineryRes.Get(entry) = components.Refinery{}
 }
