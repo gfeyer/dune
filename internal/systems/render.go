@@ -17,17 +17,16 @@ import (
 )
 
 const (
-	LayerDefault ecs.LayerID = iota
+	LayerSprites ecs.LayerID = iota
+	LayerUI
 )
 
 var (
 	qSprites = donburi.NewQuery(filter.Contains(components.Position, components.Sprite))
-	qUnitUI  = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.UnitRes, components.HealthRes, components.Velocity, components.SelectableRes))
+	qUnitUI  = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.UnitRes, components.HealthRes))
 )
 
-func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
-	screen.Fill(color.RGBA{210, 180, 140, 255}) // sand color
-
+func DrawSprites(ecs *ecs.ECS, screen *ebiten.Image) {
 	cameraEntry, _ := camera.CameraQuery.First(ecs.World)
 	cam := camera.CameraRes.Get(cameraEntry)
 
@@ -64,6 +63,11 @@ func Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 			screen.DrawImage(*img, op)
 		}
 	})
+}
+
+func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
+	cameraEntry, _ := camera.CameraQuery.First(ecs.World)
+	cam := camera.CameraRes.Get(cameraEntry)
 
 	// Draw UI elements on top of units
 	qUnitUI.Each(ecs.World, func(entry *donburi.Entry) {

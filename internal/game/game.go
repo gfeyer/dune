@@ -1,6 +1,7 @@
 package game
 
 import (
+	"image/color"
 	"math/rand"
 
 	"github.com/gfeyer/ebit/internal/camera"
@@ -60,8 +61,9 @@ func NewGame(w, h int) *Game {
 	ecs.AddSystem(systems.UpdateHarvester)
 
 	// Register renderers
-	ecs.AddRenderer(systems.LayerDefault, systems.Draw)
-	ecs.AddRenderer(systems.LayerDefault+1, systems.DrawMinimap)
+	ecs.AddRenderer(systems.LayerSprites, systems.DrawSprites)
+	ecs.AddRenderer(systems.LayerUI, systems.DrawUI)
+	ecs.AddRenderer(systems.LayerUI+1, systems.DrawMinimap)
 
 	// Spawn initial units
 	factory.CreateTrike(world, 100, 100)
@@ -85,7 +87,9 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.ecs.Draw(screen)
+	screen.Fill(color.RGBA{210, 180, 140, 255}) // sand color
+	g.ecs.DrawLayer(systems.LayerSprites, screen)
+	g.ecs.DrawLayer(systems.LayerUI, screen)
 }
 
 func (g *Game) Layout(outsideW, outsideH int) (int, int) {
