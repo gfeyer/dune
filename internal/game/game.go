@@ -90,6 +90,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{210, 180, 140, 255}) // sand color
 	g.ecs.DrawLayer(systems.LayerSprites, screen)
 	g.ecs.DrawLayer(systems.LayerUI, screen)
+	g.ecs.DrawLayer(systems.LayerUI+1, screen)
 }
 
 func (g *Game) Layout(outsideW, outsideH int) (int, int) {

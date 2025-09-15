@@ -79,12 +79,20 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	scaleX := float64(minimap.Width) / float64(settings.MapWidth)
 	scaleY := float64(minimap.Height) / float64(settings.MapHeight)
 
-	// Draw units
+	// Draw units (green)
 	QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
 		pos := components.Position.Get(entry)
 		unitX := float32(minimap.X + int(pos.X*scaleX))
 		unitY := float32(minimap.Y + int(pos.Y*scaleY))
-		screen.Set(int(unitX), int(unitY), color.White)
+		vector.DrawFilledRect(screen, unitX-1, unitY-1, 3, 3, color.RGBA{G: 255, A: 255}, false)
+	})
+
+	// Draw spice (orange)
+	QSpice.Each(ecs.World, func(entry *donburi.Entry) {
+		pos := components.Position.Get(entry)
+		spiceX := float32(minimap.X + int(pos.X*scaleX))
+		spiceY := float32(minimap.Y + int(pos.Y*scaleY))
+		vector.DrawFilledRect(screen, spiceX, spiceY, 2, 2, color.RGBA{R: 255, G: 140, A: 255}, false)
 	})
 
 	// Draw camera view
