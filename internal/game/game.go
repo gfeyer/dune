@@ -7,6 +7,7 @@ import (
 	"github.com/gfeyer/ebit/internal/camera"
 	"github.com/gfeyer/ebit/internal/components"
 	"github.com/gfeyer/ebit/internal/factory"
+	"github.com/gfeyer/ebit/internal/fog"
 	"github.com/gfeyer/ebit/internal/settings"
 	"github.com/gfeyer/ebit/internal/systems"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -62,6 +63,11 @@ func NewGame(w, h int) *Game {
 	pentry := world.Entry(pe)
 	*components.PlayerRes.Get(pentry) = components.Player{Money: 1000}
 
+	// Create fog
+	fe := world.Create(fog.FogRes)
+	fentry := world.Entry(fe)
+	*fog.FogRes.Get(fentry) = *fog.NewFog(settings.GetSettings(world), 16)
+
 	// Register systems
 	ecs.AddSystem(systems.UpdateMovement)
 	ecs.AddSystem(systems.ResolveCollisions)
@@ -70,6 +76,7 @@ func NewGame(w, h int) *Game {
 	ecs.AddSystem(camera.Update)
 	ecs.AddSystem(systems.UpdateMinimap)
 	ecs.AddSystem(systems.UpdateHarvester)
+	ecs.AddSystem(systems.UpdateFog)
 
 	// Register renderers
 	ecs.AddRenderer(systems.LayerSpice, systems.DrawSpice)
@@ -79,6 +86,7 @@ func NewGame(w, h int) *Game {
 	ecs.AddRenderer(systems.LayerMinimap, systems.DrawMinimap)
 	ecs.AddRenderer(systems.LayerBuildMenuUI, systems.DrawBuildMenu)
 	ecs.AddRenderer(systems.LayerPlacement, systems.DrawPlacement)
+	ecs.AddRenderer(systems.LayerFog, systems.DrawFog)
 
 	// Spawn initial units
 	factory.CreateTrike(world, 100, 100)
@@ -119,6 +127,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.ecs.DrawLayer(systems.LayerSpice, screen)
 	g.ecs.DrawLayer(systems.LayerBuildings, screen)
 	g.ecs.DrawLayer(systems.LayerUnits, screen)
+	g.ecs.DrawLayer(systems.LayerFog, screen)
 	g.ecs.DrawLayer(systems.LayerUI, screen)
 	g.ecs.DrawLayer(systems.LayerMinimap, screen)
 	g.ecs.DrawLayer(systems.LayerBuildMenuUI, screen)

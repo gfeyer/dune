@@ -13,5 +13,6 @@ const (
 	LayerMenus
 	LayerBuildMenuUI
 	LayerPlacement
+	LayerFog
 )
 
