@@ -32,6 +32,11 @@ func DrawBuildings(ecs *ecs.ECS, screen *ebiten.Image) {
 	qBuildings.Each(ecs.World, func(entry *donburi.Entry) {
 		p := components.Position.Get(entry)
 		img := components.Sprite.Get(entry)
+
+		if !isSpriteInView(p, *img, cam, screen) {
+			return
+		}
+
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(p.X-cam.X, p.Y-cam.Y)
 
@@ -56,6 +61,11 @@ func DrawSpice(ecs *ecs.ECS, screen *ebiten.Image) {
 	qSpice.Each(ecs.World, func(entry *donburi.Entry) {
 		p := components.Position.Get(entry)
 		img := components.Sprite.Get(entry)
+
+		if !isSpriteInView(p, *img, cam, screen) {
+			return
+		}
+
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(p.X-cam.X, p.Y-cam.Y)
 		screen.DrawImage(*img, op)
@@ -69,6 +79,11 @@ func DrawUnits(ecs *ecs.ECS, screen *ebiten.Image) {
 	qUnits.Each(ecs.World, func(entry *donburi.Entry) {
 		p := components.Position.Get(entry)
 		img := components.Sprite.Get(entry)
+
+		if !isSpriteInView(p, *img, cam, screen) {
+			return
+		}
+
 		op := &ebiten.DrawImageOptions{}
 
 		// Handle rotation for entities that have velocity
@@ -95,4 +110,28 @@ func DrawUnits(ecs *ecs.ECS, screen *ebiten.Image) {
 			screen.DrawImage(*img, op)
 		}
 	})
+}
+
+func isSpriteInView(p *components.Pos, img *ebiten.Image, cam *camera.Camera, screen *ebiten.Image) bool {
+	screenW, screenH := screen.Bounds().Dx(), screen.Bounds().Dy()
+	spriteW, spriteH := img.Bounds().Dx(), img.Bounds().Dy()
+
+	// Bounding box of the object in world coordinates.
+	objLeft := p.X
+	objRight := p.X + float64(spriteW)
+	objTop := p.Y
+	objBottom := p.Y + float64(spriteH)
+
+	// Bounding box of the camera in world coordinates.
+	camLeft := cam.X
+	camRight := cam.X + float64(screenW)
+	camTop := cam.Y
+	camBottom := cam.Y + float64(screenH)
+
+	// Check if the object's bounding box is outside the camera's bounding box.
+	if objRight < camLeft || objLeft > camRight || objBottom < camTop || objTop > camBottom {
+		return false
+	}
+
+	return true
 }
