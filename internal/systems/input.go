@@ -18,10 +18,13 @@ func abs(x int) int {
 	return x
 }
 
+// UpdateInput handles user input for selecting and commanding units.
+// It processes mouse clicks for selection, drag-selection, and issuing orders.
 func UpdateInput(ecs *ecs.ECS) {
 	dragEntry, _ := QDrag.First(ecs.World)
 	drag := components.DragRes.Get(dragEntry)
 
+	// When the left mouse button is pressed, start a drag operation.
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		drag.IsDragging = true
 		drag.StartX, drag.StartY = ebiten.CursorPosition()
@@ -31,19 +34,21 @@ func UpdateInput(ecs *ecs.ECS) {
 		drag.EndX, drag.EndY = ebiten.CursorPosition()
 	}
 
+	// When the left mouse button is released, finalize the selection.
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
 		drag.IsDragging = false
 
 		cameraEntry, _ := camera.CameraQuery.First(ecs.World)
 		cam := camera.CameraRes.Get(cameraEntry)
 
-		// Drag selection
+		// If the mouse moved significantly, treat it as a drag-selection.
 		if abs(drag.StartX-drag.EndX) > 5 || abs(drag.StartY-drag.EndY) > 5 {
-			// Deselect all units first
+			// Deselect all currently selected units before applying the new selection.
 			QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
 				components.SelectableRes.Get(entry).Selected = false
 			})
 
+			// Create a selection rectangle and select all units within it.
 			rect := image.Rect(drag.StartX, drag.StartY, drag.EndX, drag.EndY).Canon()
 			SelectableUnitQuery.Each(ecs.World, func(entry *donburi.Entry) {
 				p := components.Position.Get(entry)
@@ -52,7 +57,7 @@ func UpdateInput(ecs *ecs.ECS) {
 					components.SelectableRes.Get(entry).Selected = true
 				}
 			})
-		} else { // Single-click selection
+		} else { // If the mouse didn't move much, treat it as a single-click selection.
 			mx, my := ebiten.CursorPosition()
 			wx, wy := float64(mx)+cam.X, float64(my)+cam.Y
 
@@ -66,7 +71,7 @@ func UpdateInput(ecs *ecs.ECS) {
 				}
 			})
 
-			// Deselect all units
+			// Deselect all units before selecting the new one.
 			QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
 				// components.SelectableRes.Get(entry).Selected = false
 			})
@@ -78,14 +83,14 @@ func UpdateInput(ecs *ecs.ECS) {
 		}
 	}
 
-	// Right-click to move or harvest
+	// Handle right-click commands for selected units.
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
 		cameraEntry, _ := camera.CameraQuery.First(ecs.World)
 		cam := camera.CameraRes.Get(cameraEntry)
 		mx, my := ebiten.CursorPosition()
 		wx, wy := float64(mx)+cam.X, float64(my)+cam.Y
 
-		// Check if the click was on a spice field
+		// Check if the right-click targeted a spice field.
 		var targetSpice *donburi.Entry
 		QSpice.Each(ecs.World, func(spiceEntry *donburi.Entry) {
 			spicePos := components.Position.Get(spiceEntry)
@@ -99,6 +104,7 @@ func UpdateInput(ecs *ecs.ECS) {
 		QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
 			if components.SelectableRes.Get(entry).Selected && entry.HasComponent(components.UnitRes) {
 				unit := components.UnitRes.Get(entry)
+				// If a selected unit is a harvester and the target is a spice field, command it to harvest.
 				// If it's a harvester and a spice field was clicked, set it as the target
 				if unit.Type == components.Harvester && targetSpice != nil {
 					harvester := components.HarvesterRes.Get(entry)
@@ -106,7 +112,7 @@ func UpdateInput(ecs *ecs.ECS) {
 					harvester.TargetSpice = targetSpice.Entity()
 					spicePos := components.Position.Get(targetSpice)
 					*components.TargetRes.Get(entry) = components.Target{X: spicePos.X, Y: spicePos.Y}
-				} else { // Otherwise, it's a normal move command
+				} else { // Otherwise, issue a standard move command to the target location.
 					*components.TargetRes.Get(entry) = components.Target{X: wx, Y: wy}
 					// If it was a harvester, clear its spice target
 					if unit.Type == components.Harvester {

@@ -16,11 +16,14 @@ import (
 )
 
 var (
+	// MinimapQuery retrieves the minimap entity.
 	MinimapQuery = donburi.NewQuery(filter.Contains(components.MinimapRes))
 
+	// minimapFogImage is a pre-rendered image of the fog of war for the minimap.
 	minimapFogImage *ebiten.Image
 )
 
+// UpdateMinimap handles user input on the minimap, such as moving the camera or commanding units.
 func UpdateMinimap(ecs *ecs.ECS) {
 	minimapEntry, ok := MinimapQuery.First(ecs.World)
 	if !ok {
@@ -28,7 +31,7 @@ func UpdateMinimap(ecs *ecs.ECS) {
 	}
 	minimap := components.MinimapRes.Get(minimapEntry)
 
-	// Left-click to move camera
+	// A left-click on the minimap moves the camera to the corresponding world position.
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		mx, my := ebiten.CursorPosition()
 		if mx >= minimap.X && mx < minimap.X+minimap.Width && my >= minimap.Y && my < minimap.Y+minimap.Height {
@@ -44,7 +47,7 @@ func UpdateMinimap(ecs *ecs.ECS) {
 		}
 	}
 
-	// Right-click to command units
+	// A right-click on the minimap commands all selected units to move to the corresponding world position.
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
 		mx, my := ebiten.CursorPosition()
 		if mx >= minimap.X && mx < minimap.X+minimap.Width && my >= minimap.Y && my < minimap.Y+minimap.Height {
@@ -64,6 +67,7 @@ func UpdateMinimap(ecs *ecs.ECS) {
 	}
 }
 
+// DrawMinimap renders the minimap, including the terrain, units, spice, fog of war, and camera view.
 func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	minimapEntry, ok := MinimapQuery.First(ecs.World)
 	if !ok {
@@ -75,16 +79,16 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	cameraEntry, _ := camera.CameraQuery.First(ecs.World)
 	cam := camera.CameraRes.Get(cameraEntry)
 
-	// Minimap background (sand color)
+	// Draw the minimap's sand-colored background.
 	vector.DrawFilledRect(screen, float32(minimap.X), float32(minimap.Y), float32(minimap.Width), float32(minimap.Height), color.RGBA{210, 180, 140, 255}, false)
 
-	// Scale factors
+	// Calculate the scaling factors to convert world coordinates to minimap coordinates.
 	scaleX := float64(minimap.Width) / float64(settings.MapWidth)
 	scaleY := float64(minimap.Height) / float64(settings.MapHeight)
 
 	fogRes := fog.GetFog(ecs.World)
 
-	// Draw units (green)
+	// Draw all visible units on the minimap as green dots.
 	QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
 		pos := components.Position.Get(entry)
 
@@ -100,7 +104,7 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 		}
 	})
 
-	// Draw spice (orange)
+	// Draw all visible spice fields on the minimap as orange dots.
 	QSpice.Each(ecs.World, func(entry *donburi.Entry) {
 		pos := components.Position.Get(entry)
 
@@ -116,12 +120,12 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 		}
 	})
 
-	// Lazily initialize the minimap fog image
+	// Lazily initialize the pre-rendered fog image for the minimap if it doesn't exist or its size is incorrect.
 	if minimapFogImage == nil || minimapFogImage.Bounds().Dx() != fogRes.Width || minimapFogImage.Bounds().Dy() != fogRes.Height {
 		minimapFogImage = ebiten.NewImage(fogRes.Width, fogRes.Height)
 	}
 
-	// Update the fog image pixels
+	// Update the fog image's pixels based on the current state of the fog of war.
 	pixels := make([]byte, fogRes.Width*fogRes.Height*4)
 	for y := 0; y < fogRes.Height; y++ {
 		for x := 0; x < fogRes.Width; x++ {
@@ -136,20 +140,20 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	}
 	minimapFogImage.WritePixels(pixels)
 
-	// Draw the fog image over the minimap
+	// Draw the pre-rendered fog image over the minimap.
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(float64(minimap.Width)/float64(fogRes.Width), float64(minimap.Height)/float64(fogRes.Height))
 	op.GeoM.Translate(float64(minimap.X), float64(minimap.Y))
 	screen.DrawImage(minimapFogImage, op)
 
-	// Draw camera view
+	// Draw a rectangle on the minimap to represent the camera's current view.
 	camX := float32(minimap.X + int(cam.X*scaleX))
 	camY := float32(minimap.Y + int(cam.Y*scaleY))
 	camW := float32(float64(settings.ScreenWidth) * scaleX)
 	camH := float32(float64(settings.ScreenHeight) * scaleY)
 	vector.StrokeRect(screen, camX, camY, camW, camH, 1, color.White, false)
 
-	// Draw minimap border
+	// Draw a border around the minimap.
 	vector.StrokeRect(screen, float32(minimap.X), float32(minimap.Y), float32(minimap.Width), float32(minimap.Height), 1, color.White, false)
 
 }

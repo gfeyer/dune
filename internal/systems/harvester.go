@@ -10,11 +10,17 @@ import (
 )
 
 var (
+	// qHarvesters retrieves all harvester units.
 	qHarvesters = donburi.NewQuery(filter.Contains(components.UnitRes, components.HarvesterRes, components.Position, components.TargetRes))
-	qSpice      = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.SpiceRes, components.SpiceAmountRes))
-	qRefinery   = donburi.NewQuery(filter.Contains(components.RefineryRes, components.Position))
+	// qSpice retrieves all spice fields on the map.
+	qSpice = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.SpiceRes, components.SpiceAmountRes))
+	// qRefinery retrieves all player refineries.
+	qRefinery = donburi.NewQuery(filter.Contains(components.RefineryRes, components.Position))
 )
 
+// handleIdle manages the behavior of a harvester when it is in the Idle state.
+// If it has a target spice field, it will start moving towards it.
+// If it's carrying spice, it will move to a refinery.
 func handleIdle(ecs *ecs.ECS, harvester *components.HarvesterData, p *components.Pos, t *components.Target) {
 	// Harvester is idle, waiting for a command.
 	// If it has a target spice, it means it has completed a loop and should go back.
@@ -45,6 +51,8 @@ func handleIdle(ecs *ecs.ECS, harvester *components.HarvesterData, p *components
 	}
 }
 
+// handleMovingToSpice manages the harvester's movement towards a spice field.
+// It checks if the harvester has arrived and transitions it to the Harvesting state.
 func handleMovingToSpice(ecs *ecs.ECS, entry *donburi.Entry, harvester *components.HarvesterData, p *components.Pos, t *components.Target) {
 	// Check if target is still valid
 	if !ecs.World.Valid(harvester.TargetSpice) {
@@ -72,6 +80,7 @@ func handleMovingToSpice(ecs *ecs.ECS, entry *donburi.Entry, harvester *componen
 	}
 }
 
+// findClosestRefinery finds the refinery nearest to a given position.
 func findClosestRefinery(ecs *ecs.ECS, p *components.Pos) *donburi.Entry {
 	var closestRefinery *donburi.Entry
 	minDist := math.MaxFloat64
@@ -91,6 +100,8 @@ func findClosestRefinery(ecs *ecs.ECS, p *components.Pos) *donburi.Entry {
 	return closestRefinery
 }
 
+// handleHarvesting manages the process of a harvester gathering spice from a field.
+// It transitions the harvester to move to a refinery once its capacity is full.
 func handleHarvesting(ecs *ecs.ECS, entry *donburi.Entry, harvester *components.HarvesterData, p *components.Pos, t *components.Target) {
 	// If harvester is full, move to refinery
 	if harvester.CarriedAmount >= harvester.Capacity {
@@ -151,6 +162,8 @@ func handleHarvesting(ecs *ecs.ECS, entry *donburi.Entry, harvester *components.
 	harvester.CarriedAmount += amountToHarvest
 }
 
+// handleMovingToRefinery manages the harvester's movement towards a refinery.
+// It transitions the harvester to the Unloading state upon arrival.
 func handleMovingToRefinery(ecs *ecs.ECS, harvester *components.HarvesterData, p *components.Pos, t *components.Target) {
 
 	if harvester.TargetRefinery == 0 || !ecs.World.Valid(harvester.TargetRefinery) || t.X == 0 && t.Y == 0 {
@@ -174,6 +187,8 @@ func handleMovingToRefinery(ecs *ecs.ECS, harvester *components.HarvesterData, p
 	}
 }
 
+// handleUnloading manages the process of a harvester unloading its spice at a refinery.
+// It adds the spice to the player's resources and sets the harvester back to an Idle state.
 func handleUnloading(ecs *ecs.ECS, harvester *components.HarvesterData) {
 	playerEntry, _ := QPlayer.First(ecs.World)
 	player := components.PlayerRes.Get(playerEntry)
@@ -182,6 +197,8 @@ func handleUnloading(ecs *ecs.ECS, harvester *components.HarvesterData) {
 	harvester.State = components.StateIdle
 }
 
+// UpdateHarvester is the main function for controlling harvester behavior.
+// It iterates through all harvesters and calls the appropriate handler based on their current state.
 func UpdateHarvester(ecs *ecs.ECS) {
 	qHarvesters.Each(ecs.World, func(entry *donburi.Entry) {
 		unit := components.UnitRes.Get(entry)

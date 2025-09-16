@@ -1,3 +1,4 @@
+// Package systems contains the logic for updating the game state in response to user input and game events.
 package systems
 
 import (
@@ -14,10 +15,12 @@ import (
 )
 
 var (
+	// PlacementQuery retrieves the entity that manages the state of placing a new building.
 	PlacementQuery = donburi.NewQuery(filter.Contains(components.PlacementRes))
-	PlayerQuery    = donburi.NewQuery(filter.Contains(components.PlayerRes))
+	// PlayerQuery retrieves the player's entity, used for accessing resources like money.
+	PlayerQuery = donburi.NewQuery(filter.Contains(components.PlayerRes))
 
-	// Queries for selecting buildings
+	// SelectableBuildingQuery retrieves all building entities that can be selected by the player.
 	SelectableBuildingQuery = donburi.NewQuery(
 		filter.And(
 			filter.Contains(components.SelectableRes),
@@ -29,6 +32,8 @@ var (
 	)
 )
 
+// UpdateBuildInput handles all user input related to building placement and unit creation.
+// It's called every frame to check for mouse clicks on the world or the build menu.
 func UpdateBuildInput(ecs *ecs.ECS) {
 	placementEntry, ok := PlacementQuery.First(ecs.World)
 	if !ok {
@@ -36,14 +41,15 @@ func UpdateBuildInput(ecs *ecs.ECS) {
 	}
 	placement := components.PlacementRes.Get(placementEntry)
 
+	// If the player is currently in the process of placing a building.
 	if placement.IsPlacing {
-		// Handle cancellation
+		// Cancel placement with a right-click or by pressing the Escape key.
 		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 			placement.IsPlacing = false
 			return
 		}
 
-		// Handle placement
+		// Confirm building placement with a left-click.
 		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			playerEntry, ok := PlayerQuery.First(ecs.World)
 			if !ok {
@@ -83,7 +89,7 @@ func UpdateBuildInput(ecs *ecs.ECS) {
 		return
 	}
 
-	// If not in placement mode, handle selection and build menu clicks
+	// If not in placement mode, check for clicks on the build menu or for selecting buildings in the world.
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		mx, my := ebiten.CursorPosition()
 
@@ -125,6 +131,8 @@ func UpdateBuildInput(ecs *ecs.ECS) {
 	}
 }
 
+// checkBuildMenuClick determines if a mouse click at screen coordinates (mx, my) has occurred on a build menu icon.
+// It returns true if a menu item was clicked, handling the corresponding action, and false otherwise.
 func checkBuildMenuClick(ecs *ecs.ECS, mx, my int) bool {
 	placementEntry, ok := PlacementQuery.First(ecs.World)
 	if !ok {
@@ -146,7 +154,7 @@ func checkBuildMenuClick(ecs *ecs.ECS, mx, my int) bool {
 
 	clickedOnMenu := false
 
-	// Determine which menu to check based on selection
+	// Check if a building is currently selected to determine whether to show the unit menu or the building menu.
 	var selectedBuilding *donburi.Entry
 	SelectedBuildingQuery.Each(ecs.World, func(entry *donburi.Entry) {
 		if components.SelectableRes.Get(entry).Selected {
@@ -154,6 +162,7 @@ func checkBuildMenuClick(ecs *ecs.ECS, mx, my int) bool {
 		}
 	})
 
+	// If a building is selected, display the menu for units that can be built from it.
 	if selectedBuilding != nil {
 		var buildingType components.BuildingType
 		if selectedBuilding.HasComponent(components.RefineryRes) {
@@ -204,7 +213,7 @@ func checkBuildMenuClick(ecs *ecs.ECS, mx, my int) bool {
 			i++
 		})
 	} else {
-		// Handle building menu clicks
+		// If no building is selected, display the menu for constructing new buildings.
 		i := 0
 		BuildMenuQuery.Each(ecs.World, func(entry *donburi.Entry) {
 			buildInfo := components.BuildInfoRes.Get(entry)

@@ -15,16 +15,20 @@ import (
 )
 
 var (
+	// qPlayerUnits retrieves all player-controlled units and buildings that provide vision.
 	qPlayerUnits = donburi.NewQuery(filter.And(
 		filter.Or(filter.Contains(components.UnitRes), filter.Contains(components.RefineryRes), filter.Contains(components.BarracksRes)),
 		filter.Contains(components.Position),
 	))
 )
 
+// UpdateFog manages the fog of war logic. It first shrouds all previously visible areas
+// and then reveals the areas around the player's current units and buildings.
 func UpdateFog(ecs *ecs.ECS) {
 	fogRes := fog.GetFog(ecs.World)
 
-	// 1. Set all visible tiles to shroud
+	// 1. Set all currently visible tiles to shrouded. This creates the effect of areas becoming
+	//    unexplored again when units move away.
 	for y := 0; y < fogRes.Height; y++ {
 		for x := 0; x < fogRes.Width; x++ {
 			if fogRes.Grid[y][x] == fog.Visible {
@@ -33,7 +37,7 @@ func UpdateFog(ecs *ecs.ECS) {
 		}
 	}
 
-	// 2. Set tiles around player units to visible
+	// 2. Reveal the fog around each of the player's units and buildings.
 	qPlayerUnits.Each(ecs.World, func(entry *donburi.Entry) {
 		p := components.Position.Get(entry)
 		visionRadius := 16 // in tiles
@@ -55,6 +59,8 @@ func UpdateFog(ecs *ecs.ECS) {
 	})
 }
 
+// DrawFog renders the fog of war onto the screen. It draws a black rectangle for hidden areas
+// and a semi-transparent one for shrouded areas.
 func DrawFog(ecs *ecs.ECS, screen *ebiten.Image) {
 	cameraEntry, _ := camera.CameraQuery.First(ecs.World)
 	cam := camera.CameraRes.Get(cameraEntry)
@@ -69,10 +75,12 @@ func DrawFog(ecs *ecs.ECS, screen *ebiten.Image) {
 			screenX := worldX - float32(cam.X)
 			screenY := worldY - float32(cam.Y)
 
+			// Culling: Don't draw fog tiles that are outside the camera's view.
 			if screenX+float32(fogRes.TileSize) < 0 || screenX > float32(s.ScreenWidth) || screenY+float32(fogRes.TileSize) < 0 || screenY > float32(s.ScreenHeight) {
 				continue
 			}
 
+			// Render the fog tile based on its state (Hidden, Shroud, or Visible).
 			switch fogRes.Grid[y][x] {
 			case fog.Hidden:
 				vector.DrawFilledRect(screen, screenX, screenY, float32(fogRes.TileSize), float32(fogRes.TileSize), color.Black, false)
