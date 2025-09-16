@@ -36,7 +36,7 @@ func UpdateFog(ecs *ecs.ECS) {
 	// 2. Set tiles around player units to visible
 	qPlayerUnits.Each(ecs.World, func(entry *donburi.Entry) {
 		p := components.Position.Get(entry)
-		visionRadius := 12 // in tiles
+		visionRadius := 16 // in tiles
 
 		tileX := int(p.X) / fogRes.TileSize
 		tileY := int(p.Y) / fogRes.TileSize
