@@ -6,6 +6,7 @@ import (
 
 	"github.com/gfeyer/ebit/internal/camera"
 	"github.com/gfeyer/ebit/internal/components"
+	"github.com/gfeyer/ebit/internal/settings"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -102,4 +103,9 @@ func DrawUI(ecs *ecs.ECS, screen *ebiten.Image) {
 			vector.StrokeRect(screen, float32(drag.StartX), float32(drag.StartY), float32(drag.EndX-drag.StartX), float32(drag.EndY-drag.StartY), 1, color.White, false)
 		}
 	}
+
+	// Draw FPS counter
+	s := settings.GetSettings(ecs.World)
+	fpsText := fmt.Sprintf("FPS: %.2f", ebiten.ActualFPS())
+	text.Draw(screen, fpsText, basicfont.Face7x13, s.ScreenWidth-80, s.ScreenHeight-10, color.White)
 }
