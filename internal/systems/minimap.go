@@ -149,4 +149,7 @@ func DrawMinimap(ecs *ecs.ECS, screen *ebiten.Image) {
 	camH := float32(float64(settings.ScreenHeight) * scaleY)
 	vector.StrokeRect(screen, camX, camY, camW, camH, 1, color.White, false)
 
+	// Draw minimap border
+	vector.StrokeRect(screen, float32(minimap.X), float32(minimap.Y), float32(minimap.Width), float32(minimap.Height), 1, color.White, false)
+
 }

@@ -3,7 +3,6 @@ package factory
 import (
 	"fmt"
 	"image/color"
-	"math/rand/v2"
 
 	"github.com/gfeyer/ebit/internal/components"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -25,7 +24,7 @@ func CreateHarvester(w donburi.World, x, y float64) {
 	*components.UnitRes.Get(entry) = components.Unit{Type: components.Harvester}
 	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
 	*components.Velocity.Get(entry) = components.Vel{}
-	*components.HarvesterRes.Get(entry) = components.HarvesterData{Capacity: 233}
+	*components.HarvesterRes.Get(entry) = components.HarvesterData{Capacity: 100}
 	*components.HealthRes.Get(entry) = components.Health{Current: 100, Max: 100}
 }
 
@@ -76,8 +75,7 @@ func CreateSpice(w donburi.World, x, y float64) {
 	entry := w.Entry(e)
 
 	// Spice is an orange square
-	amount := rand.IntN(900) + 100
-	img := ebiten.NewImage(amount/5, amount/5)
+	img := ebiten.NewImage(64, 64)
 	img.Fill(color.RGBA{R: 210, G: 105, B: 30, A: 255})
 
 	*components.Position.Get(entry) = components.Pos{X: x, Y: y}
@@ -85,7 +83,7 @@ func CreateSpice(w donburi.World, x, y float64) {
 	*components.SpiceRes.Get(entry) = components.Spice{}
 	*components.Velocity.Get(entry) = components.Vel{}
 	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
-	*components.SpiceAmountRes.Get(entry) = components.SpiceAmount{Amount: amount}
+	*components.SpiceAmountRes.Get(entry) = components.SpiceAmount{Amount: 1000}
 }
 
 func CreateBuildOption(w donburi.World, btype components.BuildingType, name string, cost int, width, height int) {
