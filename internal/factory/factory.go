@@ -24,7 +24,7 @@ func CreateHarvester(w donburi.World, x, y float64) {
 	*components.UnitRes.Get(entry) = components.Unit{Type: components.Harvester}
 	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
 	*components.Velocity.Get(entry) = components.Vel{}
-	*components.HarvesterRes.Get(entry) = components.HarvesterData{Capacity: 100}
+	*components.HarvesterRes.Get(entry) = components.HarvesterData{Capacity: 233}
 	*components.HealthRes.Get(entry) = components.Health{Current: 100, Max: 100}
 }
 

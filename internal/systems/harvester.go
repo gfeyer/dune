@@ -1,6 +1,7 @@
 package systems
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/gfeyer/ebit/internal/components"
@@ -127,14 +128,23 @@ func handleHarvesting(ecs *ecs.ECS, entry *donburi.Entry, harvester *components.
 		amountToHarvest = spiceAmount.Amount
 	}
 
-	// If spice field is empty, go idle
+	// If spice field is empty, go idle or to a refinery
 	if amountToHarvest == 0 {
 		ecs.World.Remove(targetSpiceEntry.Entity())
 
-		// Go idle and wait for a new command.
-		harvester.State = components.StateIdle
-		harvester.TargetSpice = 0
-		*t = components.Target{}
+		if harvester.CarriedAmount > 0 {
+			harvester.State = components.StateMovingToRefinery
+			if closestRefinery := findClosestRefinery(ecs, p); closestRefinery != nil {
+				harvester.TargetRefinery = closestRefinery.Entity()
+				refineryPos := components.Position.Get(closestRefinery)
+				t.X, t.Y = refineryPos.X, refineryPos.Y
+			}
+		} else {
+			// Go idle and wait for a new command.
+			harvester.State = components.StateIdle
+			harvester.TargetSpice = 0
+			*t = components.Target{}
+		}
 		return
 	}
 
@@ -143,16 +153,20 @@ func handleHarvesting(ecs *ecs.ECS, entry *donburi.Entry, harvester *components.
 }
 
 func handleMovingToRefinery(ecs *ecs.ECS, harvester *components.HarvesterData, p *components.Pos, t *components.Target) {
-	if harvester.TargetRefinery == 0 || !ecs.World.Valid(harvester.TargetRefinery) {
+
+	if harvester.TargetRefinery == 0 || !ecs.World.Valid(harvester.TargetRefinery) || t.X == 0 && t.Y == 0 {
 		if closestRefinery := findClosestRefinery(ecs, p); closestRefinery != nil {
 			harvester.TargetRefinery = closestRefinery.Entity()
 			refineryPos := components.Position.Get(closestRefinery)
 			t.X, t.Y = refineryPos.X, refineryPos.Y
+			fmt.Println("Harvester is moving to new found refinery id: ", harvester.TargetRefinery)
 		} else {
 			harvester.State = components.StateIdle
+			fmt.Println("No refinery found")
 			return
 		}
 	}
+
 	targetRefineryEntry := ecs.World.Entry(harvester.TargetRefinery)
 	refineryPos := components.Position.Get(targetRefineryEntry)
 	dx := refineryPos.X - p.X
@@ -181,6 +195,8 @@ func UpdateHarvester(ecs *ecs.ECS) {
 		harvester := components.HarvesterRes.Get(entry)
 		p := components.Position.Get(entry)
 		t := components.TargetRes.Get(entry)
+
+		fmt.Println("Harvester state: ", harvester.State)
 
 		switch harvester.State {
 		case components.StateIdle:
