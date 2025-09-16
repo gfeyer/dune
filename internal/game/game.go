@@ -72,7 +72,9 @@ func NewGame(w, h int) *Game {
 	ecs.AddSystem(systems.UpdateHarvester)
 
 	// Register renderers
-	ecs.AddRenderer(systems.LayerSprites, systems.DrawSprites)
+	ecs.AddRenderer(systems.LayerSpice, systems.DrawSpice)
+	ecs.AddRenderer(systems.LayerBuildings, systems.DrawBuildings)
+	ecs.AddRenderer(systems.LayerUnits, systems.DrawUnits)
 	ecs.AddRenderer(systems.LayerUI, systems.DrawUI)
 	ecs.AddRenderer(systems.LayerMinimap, systems.DrawMinimap)
 	ecs.AddRenderer(systems.LayerBuildMenuUI, systems.DrawBuildMenu)
@@ -114,7 +116,9 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{210, 180, 140, 255}) // sand color
-	g.ecs.DrawLayer(systems.LayerSprites, screen)
+	g.ecs.DrawLayer(systems.LayerSpice, screen)
+	g.ecs.DrawLayer(systems.LayerBuildings, screen)
+	g.ecs.DrawLayer(systems.LayerUnits, screen)
 	g.ecs.DrawLayer(systems.LayerUI, screen)
 	g.ecs.DrawLayer(systems.LayerMinimap, screen)
 	g.ecs.DrawLayer(systems.LayerBuildMenuUI, screen)

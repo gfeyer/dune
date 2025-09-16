@@ -11,7 +11,7 @@ import (
 
 var (
 	qHarvesters = donburi.NewQuery(filter.Contains(components.UnitRes, components.HarvesterRes, components.Position, components.TargetRes))
-	qSpice      = donburi.NewQuery(filter.Contains(components.SpiceRes, components.SpiceAmountRes, components.Position))
+	qSpice      = donburi.NewQuery(filter.Contains(components.Position, components.Sprite, components.SpiceRes, components.SpiceAmountRes))
 	qRefinery   = donburi.NewQuery(filter.Contains(components.RefineryRes, components.Position))
 )
 
