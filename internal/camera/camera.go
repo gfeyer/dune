@@ -1,6 +1,7 @@
 package camera
 
 import (
+	"github.com/gfeyer/ebit/internal/components"
 	"github.com/gfeyer/ebit/internal/settings"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/yohamta/donburi"
@@ -30,6 +31,31 @@ func Update(ecs *ecs.ECS) {
 	cam := CameraRes.Get(cameraEntry)
 
 	settings := settings.GetSettings(ecs.World)
+
+	// Pan with mouse at screen edges
+	mx, my := ebiten.CursorPosition()
+
+	minimapEntry, ok := donburi.NewQuery(filter.Contains(components.MinimapRes)).First(ecs.World)
+	if ok {
+		minimap := components.MinimapRes.Get(minimapEntry)
+		inMinimap := mx >= minimap.X && mx < minimap.X+minimap.Width && my >= minimap.Y && my < minimap.Y+minimap.Height
+
+		scrollMargin := 20
+		scrollSpeed := 5.0
+
+		if mx < scrollMargin {
+			cam.X -= scrollSpeed
+		}
+		if mx > settings.ScreenWidth-scrollMargin && !inMinimap {
+			cam.X += scrollSpeed
+		}
+		if my < scrollMargin && !inMinimap {
+			cam.Y -= scrollSpeed
+		}
+		if my > settings.ScreenHeight-scrollMargin {
+			cam.Y += scrollSpeed
+		}
+	}
 
 	// Pan with arrow keys
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
