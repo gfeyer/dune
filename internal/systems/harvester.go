@@ -1,7 +1,6 @@
 package systems
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/gfeyer/ebit/internal/components"
@@ -159,10 +158,8 @@ func handleMovingToRefinery(ecs *ecs.ECS, harvester *components.HarvesterData, p
 			harvester.TargetRefinery = closestRefinery.Entity()
 			refineryPos := components.Position.Get(closestRefinery)
 			t.X, t.Y = refineryPos.X, refineryPos.Y
-			fmt.Println("Harvester is moving to new found refinery id: ", harvester.TargetRefinery)
 		} else {
 			harvester.State = components.StateIdle
-			fmt.Println("No refinery found")
 			return
 		}
 	}
@@ -195,8 +192,6 @@ func UpdateHarvester(ecs *ecs.ECS) {
 		harvester := components.HarvesterRes.Get(entry)
 		p := components.Position.Get(entry)
 		t := components.TargetRes.Get(entry)
-
-		fmt.Println("Harvester state: ", harvester.State)
 
 		switch harvester.State {
 		case components.StateIdle:

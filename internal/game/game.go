@@ -65,9 +65,9 @@ func NewGame(w, h int) *Game {
 	// Register systems
 	ecs.AddSystem(systems.UpdateMovement)
 	ecs.AddSystem(systems.ResolveCollisions)
-	ecs.AddSystem(camera.Update) // Update camera first
 	ecs.AddSystem(systems.UpdateInput)
-	ecs.AddSystem(systems.UpdateBuildInput) // Then handle input
+	ecs.AddSystem(systems.UpdateBuildInput)
+	ecs.AddSystem(camera.Update)
 	ecs.AddSystem(systems.UpdateMinimap)
 	ecs.AddSystem(systems.UpdateHarvester)
 
