@@ -68,7 +68,7 @@ func UpdateInput(ecs *ecs.ECS) {
 
 			// Deselect all units
 			QSelectable.Each(ecs.World, func(entry *donburi.Entry) {
-				components.SelectableRes.Get(entry).Selected = false
+				// components.SelectableRes.Get(entry).Selected = false
 			})
 
 			// Select only the clicked unit

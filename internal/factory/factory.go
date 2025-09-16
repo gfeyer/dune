@@ -3,6 +3,7 @@ package factory
 import (
 	"fmt"
 	"image/color"
+	"math/rand"
 
 	"github.com/gfeyer/ebit/internal/components"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -83,7 +84,7 @@ func CreateSpice(w donburi.World, x, y float64) {
 	*components.SpiceRes.Get(entry) = components.Spice{}
 	*components.Velocity.Get(entry) = components.Vel{}
 	*components.SelectableRes.Get(entry) = components.Selectable{Selected: false}
-	*components.SpiceAmountRes.Get(entry) = components.SpiceAmount{Amount: 1000}
+	*components.SpiceAmountRes.Get(entry) = components.SpiceAmount{Amount: rand.Intn(2000) + 1000}
 }
 
 func CreateBuildOption(w donburi.World, btype components.BuildingType, name string, cost int, width, height int) {

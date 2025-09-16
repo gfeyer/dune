@@ -1,6 +1,8 @@
 package systems
 
 import (
+	"math/rand"
+
 	"github.com/gfeyer/ebit/internal/camera"
 	"github.com/gfeyer/ebit/internal/components"
 	"github.com/gfeyer/ebit/internal/factory"
@@ -185,8 +187,8 @@ func checkBuildMenuClick(ecs *ecs.ECS, mx, my int) bool {
 				if player.Money >= unitInfo.Cost {
 					player.Money -= unitInfo.Cost
 					buildingPos := components.Position.Get(selectedBuilding)
-					spawnX := buildingPos.X + 64 + 10 // Spawn to the right of the building
-					spawnY := buildingPos.Y
+					spawnX := buildingPos.X + float64(rand.Intn(64)) + 32 // Spawn to the right of the building
+					spawnY := buildingPos.Y + float64(rand.Intn(64)) + 32
 
 					switch unitInfo.Type {
 					case components.Harvester:

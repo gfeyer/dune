@@ -30,7 +30,7 @@ func ResolveCollisions(ecs *ecs.ECS) {
 			s2 := components.Sprite.Get(other)
 			radius1 := float64((*s1).Bounds().Dx()) / 2
 			radius2 := float64((*s2).Bounds().Dx()) / 2
-			requiredDist := radius1 + radius2
+			requiredDist := (radius1 + radius2) * 0.5 // Allow 50% overlap
 
 			if dist < requiredDist {
 				overlap := (requiredDist - dist) / 2
