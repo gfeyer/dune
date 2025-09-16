@@ -36,7 +36,10 @@ func NewGame(w, h int) *Game {
 	// Register camera
 	ce := world.Create(camera.CameraRes)
 	centry := world.Entry(ce)
-	*camera.CameraRes.Get(centry) = camera.Camera{}
+	*camera.CameraRes.Get(centry) = camera.Camera{
+		X: float64((w*4)/2 - w/2),
+		Y: float64((h*4)/2 - h/2),
+	}
 
 	// Create minimap
 	mme := world.Create(components.MinimapRes)
@@ -89,9 +92,12 @@ func NewGame(w, h int) *Game {
 	ecs.AddRenderer(systems.LayerFog, systems.DrawFog)
 
 	// Spawn initial units
-	factory.CreateTrike(world, 100, 100)
-	factory.CreateHarvester(world, 200, 200)
-	factory.CreateRefinery(world, 50, 50)
+	s := settings.GetSettings(world)
+	centerX := float64(s.MapWidth) / 2
+	centerY := float64(s.MapHeight) / 2
+	factory.CreateTrike(world, centerX+50, centerY+50)
+	factory.CreateHarvester(world, centerX, centerY-50)
+	factory.CreateRefinery(world, centerX-50, centerY-50)
 
 	// Create build options
 	minimap := components.MinimapRes.Get(mmentry)
@@ -107,7 +113,6 @@ func NewGame(w, h int) *Game {
 	factory.CreateUnitOption(world, components.Quad, "Quad", 800, components.BuildingBarracks, iconWidth, iconHeight)
 
 	// Spawn spice
-	s := settings.GetSettings(world)
 	for i := 0; i < 50; i++ {
 		x := rand.Float64() * float64(s.MapWidth)
 		y := rand.Float64() * float64(s.MapHeight)
